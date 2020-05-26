@@ -2,22 +2,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.springboot.cloud</groupId>
-    <artifactId>consumer-ribbon</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>ribbon-consumer</name>
-    <description>Demo project for Spring Cloud Ribbon Consumer</description>
-
     <parent>
         <groupId>com.springboot.cloud</groupId>
         <artifactId>demos</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <artifactId>consumer-ribbon</artifactId>
+    <packaging>jar</packaging>
+
+    <name>ribbon-consumer</name>
+    <description>Demo project for Spring Cloud Ribbon Consumer</description>
 
     <dependencies>
+        <!--熔断降级-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.springboot.cloud</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>

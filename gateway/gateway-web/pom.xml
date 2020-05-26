@@ -2,27 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.springboot.cloud</groupId>
-    <artifactId>gateway-web</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>gateway-web</name>
-    <description>Demo Gateway Api project for Spring Boot</description>
-
     <parent>
         <groupId>com.springboot.cloud</groupId>
         <artifactId>gateway</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <artifactId>gateway-web</artifactId>
+    <packaging>jar</packaging>
+
+    <name>gateway-web</name>
+    <description>Demo Gateway Api project for Spring Boot</description>
 
     <dependencies>
         <!--core基础类库-->
         <dependency>
             <groupId>com.springboot.cloud</groupId>
             <artifactId>core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <!--api网关-->
         <dependency>
@@ -38,23 +33,28 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
         </dependency>
         <!--网关签权客户端-->
         <dependency>
             <groupId>com.springboot.cloud</groupId>
             <artifactId>authentication-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-starter-redis</artifactId>
+        </dependency>
+        <!--消息总线-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
         </dependency>
     </dependencies>
 

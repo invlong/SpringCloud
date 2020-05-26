@@ -2,20 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.springboot.cloud</groupId>
-    <artifactId>producer-jpa</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>producer-jpa</name>
-    <description>Demo project for Spring Cloud Producer</description>
-
     <parent>
         <groupId>com.springboot.cloud</groupId>
         <artifactId>demos</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <artifactId>producer-jpa</artifactId>
+    <packaging>jar</packaging>
+
+    <name>producer-jpa</name>
+    <description>Demo project for Spring Cloud Producer</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,8 +24,20 @@
     <dependencies>
         <dependency>
             <groupId>com.springboot.cloud</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.springboot.cloud</groupId>
             <artifactId>web</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <!--注册中心-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
         </dependency>
         <!--配置中心客户端-->
         <dependency>
