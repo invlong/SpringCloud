@@ -265,6 +265,6 @@
         <module>monitor</module>
         <module>sysadmin</module>
         <module>demos</module>
-        <module>k12cloud</module>
+        <module>weds</module>
     </modules>
 </project>
