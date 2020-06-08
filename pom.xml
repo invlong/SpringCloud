@@ -39,6 +39,9 @@
         <spring-boot-dependencies.version>2.1.4.RELEASE</spring-boot-dependencies.version>
         <spring-cloud-dependencies.version>Greenwich.RELEASE</spring-cloud-dependencies.version>
         <spring-cloud-alibaba-dependencies.version>2.1.0.RELEASE</spring-cloud-alibaba-dependencies.version>
+        <com.springboot.cloud-core.version>0.0.1-SNAPSHOT</com.springboot.cloud-core.version>
+        <com.springboot.cloud-web.version>0.0.1-SNAPSHOT</com.springboot.cloud-web.version>
+        <com.springboot.cloud-authentication-client.version>0.0.1-SNAPSHOT</com.springboot.cloud-authentication-client.version>
     </properties>
 
     <dependencies>
@@ -173,17 +176,17 @@
             <dependency>
                 <groupId>com.springboot.cloud</groupId>
                 <artifactId>core</artifactId>
-                <version>${project.version}</version>
+                <version>${com.springboot.cloud-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.springboot.cloud</groupId>
                 <artifactId>web</artifactId>
-                <version>${project.version}</version>
+                <version>${com.springboot.cloud-web.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.springboot.cloud</groupId>
                 <artifactId>authentication-client</artifactId>
-                <version>${project.version}</version>
+                <version>${com.springboot.cloud-authentication-client.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.flywaydb</groupId>
