@@ -1,9 +1,4 @@
 spring:
-  rabbitmq:
-    host: ${RABBIT_MQ_HOST:localhost}
-    port: ${RABBIT_MQ_PORT:5672}
-    username: ${RABBIT_MQ_USERNAME:guest}
-    password: ${RABBIT_MQ_PASSWORD:guest}
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
@@ -15,42 +10,45 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:3306}/sc_gateway?characterEncoding=UTF-8&useUnicode=true&useSSL=false
     username: ${DATASOURCE_USERNAME:root}
-    password: ${DATASOURCE_PASSWORD:root123}
+    password: ${DATASOURCE_PASSWORD:123456}
 
-  zipkin:
-    enabled: true
-    sender:
-      type: rabbit
-  sleuth:
-    enabled: true
-    http:
-      legacy:
-        enabled: true
-  #jwt密码
+#  zipkin:
+#    enabled: true
+#    sender:
+#      type: rabbit
+#  sleuth:
+#    enabled: true
+#    http:
+#      legacy:
+#        enabled: true
+#  #jwt密码
   security:
     oauth2:
       jwt:
         signingKey: 123456
-  cloud:
-    gateway:
-      default-filters:
-        - name: Retry
-          args:
-            retries: 3
-            statuses: BAD_GATEWAY
-        - AddResponseHeader=X-Response-Default-Foo, Default-Bar
-        - name: RequestRateLimiter
-          args:
-            redis-rate-limiter.replenishRate: 2  #流速 每秒
-            redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
-            rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
-            key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
+#  cloud:
+#    gateway:
+#      default-filters:
+#        - name: Retry
+#          args:
+#            retries: 3
+#            statuses: BAD_GATEWAY
+#        - AddResponseHeader=X-Response-Default-Foo, Default-Bar
+#        - name: RequestRateLimiter
+#          args:
+#            redis-rate-limiter.replenishRate: 2  #流速 每秒
+#            redis-rate-limiter.burstCapacity: 10   #令牌桶的容积
+#            rate-limiter: "#{@defaultRedisRateLimiter}"  #SPEL表达式去的对应的bean
+#            key-resolver: "#{@apiKeyResolver}" #SPEL表达式去的对应的bean
 feign:
   sentinel:
     enabled: true
   okhttp:
     enabled: true
-
+nacos:
+  config:
+    data-id: gateway.json
+    group: java
 jetcache:
   statIntervalMinutes: 1
   areaInCacheName: false
@@ -78,13 +76,15 @@ jetcache:
 gate:
   ignore:
     authentication:
-      startWith: /oauth,/open,/v2/api-docs
+      startWith: /oauth,/open,/v2/api-docs,/route/add,/bfd
 
 management:
   endpoints:
     web:
       exposure:
         include: '*'
+  security:
+    enabled: false
 
 logging:
   level:

@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Configuration
+@Deprecated
 public class DefaultRedisRateLimiter extends RedisRateLimiter {
 
     Config getDefaultConfig() {

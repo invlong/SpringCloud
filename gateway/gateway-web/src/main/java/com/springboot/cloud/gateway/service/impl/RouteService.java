@@ -1,65 +1,37 @@
 package com.springboot.cloud.gateway.service.impl;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.CreateCache;
+import com.alibaba.fastjson.JSONObject;
+import com.springboot.cloud.gateway.model.GatewayFilterDefinition;
+import com.springboot.cloud.gateway.model.GatewayPredicateDefinition;
+import com.springboot.cloud.gateway.model.GatewayRouteDefinition;
 import com.springboot.cloud.gateway.service.IRouteService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
+import org.springframework.cloud.gateway.filter.FilterDefinition;
+import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinition;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.cloud.gateway.route.RouteDefinitionWriter;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @Slf4j
-public class RouteService implements IRouteService {
+public class RouteService implements IRouteService, ApplicationEventPublisherAware {
 
-    private static final String GATEWAY_ROUTES = "gateway_routes::";
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private RouteDefinitionWriter routeDefinitionWriter;
 
-    @CreateCache(name = GATEWAY_ROUTES, cacheType = CacheType.REMOTE)
-    private Cache<String, RouteDefinition> gatewayRouteCache;
+    private ApplicationEventPublisher publisher;
 
     private Map<String, RouteDefinition> routeDefinitionMaps = new HashMap<>();
-
-    @PostConstruct
-    private void loadRouteDefinition() {
-        log.info("loadRouteDefinition, 开始初使化路由");
-        Set<String> gatewayKeys = stringRedisTemplate.keys(GATEWAY_ROUTES + "*");
-        if (CollectionUtils.isEmpty(gatewayKeys)) {
-            return;
-        }
-        log.info("预计初使化路由, gatewayKeys：{}", gatewayKeys);
-        // 去掉key的前缀
-        Set<String> gatewayKeyIds = gatewayKeys.stream().map(key -> {
-            return key.replace(GATEWAY_ROUTES, StringUtils.EMPTY);
-        }).collect(Collectors.toSet());
-        Map<String, RouteDefinition> allRoutes = gatewayRouteCache.getAll(gatewayKeyIds);
-        log.info("gatewayKeys：{}", allRoutes);
-        // 以下代码原因是，jetcache将RouteDefinition返序列化后，uri发生变化，未初使化，导致路由异常，以下代码是重新初使化uri
-        allRoutes.values().forEach(routeDefinition -> {
-            try {
-                routeDefinition.setUri(new URI(routeDefinition.getUri().toASCIIString()));
-            } catch (URISyntaxException e) {
-                log.error("网关加载RouteDefinition异常：", e);
-            }
-        });
-        routeDefinitionMaps.putAll(allRoutes);
-        log.info("共初使化路由信息：{}", routeDefinitionMaps.size());
-    }
 
     @Override
     public Collection<RouteDefinition> getRouteDefinitions() {
@@ -78,5 +50,66 @@ public class RouteService implements IRouteService {
         routeDefinitionMaps.remove(routeId);
         log.info("删除路由1条：{},目前路由共{}条", routeId, routeDefinitionMaps.size());
         return true;
+    }
+
+    public String addDefinition(RouteDefinition definition) {
+        routeDefinitionWriter.save(Mono.just(definition)).subscribe();
+        this.publisher.publishEvent(new RefreshRoutesEvent(this));
+        return "success";
+    }
+
+    public RouteDefinition assembleRouteDefinition(GatewayRouteDefinition gwdefinition) {
+
+        RouteDefinition definition = new RouteDefinition();
+        // ID
+        definition.setId(gwdefinition.getId());
+        // Predicates
+        List<PredicateDefinition> pdList = new ArrayList<>();
+        for (GatewayPredicateDefinition gpDefinition : gwdefinition.getPredicates()) {
+            PredicateDefinition predicate = new PredicateDefinition();
+            predicate.setArgs(gpDefinition.getArgs());
+            predicate.setName(gpDefinition.getName());
+            pdList.add(predicate);
+        }
+        definition.setPredicates(pdList);
+        // Filters
+        List<FilterDefinition> fdList = new ArrayList<>();
+        for (GatewayFilterDefinition gfDefinition : gwdefinition.getFilters()) {
+            FilterDefinition filter = new FilterDefinition();
+            filter.setArgs(gfDefinition.getArgs());
+            filter.setName(gfDefinition.getName());
+            fdList.add(filter);
+        }
+        definition.setFilters(fdList);
+        // URI
+        URI uri = UriComponentsBuilder.fromUriString(gwdefinition.getUri()).build().toUri();
+        definition.setUri(uri);
+
+        return definition;
+    }
+
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.publisher = applicationEventPublisher;
+    }
+
+    public void update(GatewayRouteDefinition definition) {
+        RouteDefinition routeDefinition = assembleRouteDefinition(definition);
+        log.info("GatewayRouteDefinition definition is {},RouteDefinition routeDefinition is {}", JSONObject.toJSONString(definition),JSONObject.toJSONString(routeDefinition));
+        if (routeDefinition != null) {
+            try {
+                routeDefinitionWriter.delete(Mono.just(definition.getId()));
+            } catch (Exception e) {
+                log.error("GatewayRouteDefinition update error", e);
+                return;
+            }
+            try {
+                routeDefinitionWriter.save(Mono.just(routeDefinition)).subscribe();
+                this.publisher.publishEvent(new RefreshRoutesEvent(this));
+            } catch (Exception e) {
+                log.error("routeDefinitionWriter save error",e);
+            }
+        }
+
     }
 }

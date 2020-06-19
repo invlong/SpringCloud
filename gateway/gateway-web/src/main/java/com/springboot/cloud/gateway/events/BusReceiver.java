@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.stereotype.Component;
 
-@Component
+@Deprecated
 @Slf4j
 public class BusReceiver {
 

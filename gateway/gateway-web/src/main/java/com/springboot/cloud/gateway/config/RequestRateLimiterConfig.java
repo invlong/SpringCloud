@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
  * 自定义限流标志的key，多个维度可以从这里入手
  * exchange对象中获取服务ID、请求信息，用户信息等
  */
-@Component
+@Deprecated
 public class RequestRateLimiterConfig {
 
     /**
