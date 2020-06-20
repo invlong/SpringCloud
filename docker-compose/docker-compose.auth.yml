@@ -2,7 +2,7 @@ version: '3'
 services:
   #授权服务
   authorization-server:
-    image: cike/authorization-server:latest
+    image: invlong/authorization-server:latest
     container_name: sc-authorization-server
     restart: always
     networks:
@@ -17,7 +17,7 @@ services:
 
   #认证服务
   authentication-server:
-    image: cike/authentication-server:latest
+    image: invlong/authentication-server:latest
     container_name: sc-authentication-server
     restart: always
     networks:
@@ -32,7 +32,7 @@ services:
 
   #组织服务
   organization:
-    image: cike/organization:latest
+    image: invlong/organization:latest
     container_name: sc-organization
     restart: always
     networks:
