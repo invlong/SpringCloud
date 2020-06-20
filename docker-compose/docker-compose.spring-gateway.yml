@@ -2,7 +2,7 @@ version: '3'
 services:
   #网关服务
   gateway-web:
-    image: cike/gateway-web:latest
+    image: 10.0.0.102/java/gateway-web:latest
     container_name: sc-gateway-web
     restart: always
     networks:
@@ -15,7 +15,7 @@ services:
 
   #网关管理服务
   gateway-admin:
-    image: cike/gateway-admin:latest
+    image: 10.0.0.102/java/gateway-admin:latest
     container_name: sc-gateway-admin
     restart: always
     networks:
