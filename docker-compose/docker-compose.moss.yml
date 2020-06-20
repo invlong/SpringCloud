@@ -26,3 +26,6 @@ services:
       TZ: Asia/Shanghai
     depends_on:
       - moss-db-init
+networks:
+  sc-net:
+    external: false
