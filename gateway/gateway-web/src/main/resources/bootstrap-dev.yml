@@ -1,31 +1,47 @@
+server:
+  port: 8443
 spring:
+  application:
+    name: gateway-web
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8080
+      eager: true
+    nacos:
+      discovery:
+        server-addr: 10.0.0.110:8848
+        namespace: c0abbb1a-f8fb-4fef-8a00-c1fabc500abf
+      config:
+        server-addr: 10.0.0.110:8848
+        namespace: c0abbb1a-f8fb-4fef-8a00-c1fabc500abf
+        file-extension: json
+        prefix: gateway
+        shared-dataids: gateway.json
+        refreshable-dataids: gateway.json
+        group: java
+
+    # 服务启动直接建立心跳连接
+    eager: true
   redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
+    host: 127.0.0.1
+    port: 6379
     #password: ${REDIS_PASSWORD:}
     lettuce:
       pool:
         max-active: 300
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:3306}/sc_gateway?characterEncoding=UTF-8&useUnicode=true&useSSL=false
-    username: ${DATASOURCE_USERNAME:root}
-    password: ${DATASOURCE_PASSWORD:123456}
-
-#  zipkin:
-#    enabled: true
-#    sender:
-#      type: rabbit
-#  sleuth:
-#    enabled: true
-#    http:
-#      legacy:
-#        enabled: true
-#  #jwt密码
   security:
     oauth2:
       jwt:
         signingKey: 123456
+nacos:
+  config:
+    data-id: gateway.json
+    group: java
+  main:
+    allow-bean-definition-overriding: true
+
 #  cloud:
 #    gateway:
 #      default-filters:
@@ -45,10 +61,6 @@ feign:
     enabled: true
   okhttp:
     enabled: true
-nacos:
-  config:
-    data-id: gateway.json
-    group: java
 jetcache:
   statIntervalMinutes: 1
   areaInCacheName: false
@@ -85,11 +97,5 @@ management:
         include: '*'
   security:
     enabled: false
-
 logging:
-  level:
-    com.springboot.cloud: debug
-    com.jalja.org.spring: debug
-  path: logs/
-  file:
-    max-size: 1GB
+  config: classpath:log4j2.xml
