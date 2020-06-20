@@ -1,21 +1,3 @@
-server:
-  port: ${SERVER_PORT:8443}
 spring:
-  application:
-    name: gateway-web
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 10.0.0.110:8848
-        namespace: c0abbb1a-f8fb-4fef-8a00-c1fabc500abf
-      config:
-        server-addr: 10.0.0.110:8848
-        namespace: c0abbb1a-f8fb-4fef-8a00-c1fabc500abf
-        file-extension: json
-        prefix: gateway
-        shared-dataids: gateway.json
-        refreshable-dataids: gateway.json
-        group: java
-    sentinel:
-      transport:
-        dashboard: ${SENTINEL_DASHBOARD_HOST:localhost}:${SENTINEL_DASHBOARD_PORT:8021}
+  profiles:
+    active: dev
