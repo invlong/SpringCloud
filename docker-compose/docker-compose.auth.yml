@@ -2,7 +2,7 @@ version: '3'
 services:
   #授权服务
   authorization-server:
-    image: invlong/authorization-server:latest
+    image: 10.0.0.102/java/authorization-server:latest
     container_name: sc-authorization-server
     restart: always
     networks:
@@ -17,7 +17,7 @@ services:
 
   #认证服务
   authentication-server:
-    image: invlong/authentication-server:latest
+    image: 10.0.0.102/java/authentication-server:latest
     container_name: sc-authentication-server
     restart: always
     networks:
@@ -32,7 +32,7 @@ services:
 
   #组织服务
   organization:
-    image: invlong/organization:latest
+    image: 10.0.0.102/java/organization:latest
     container_name: sc-organization
     restart: always
     networks:
