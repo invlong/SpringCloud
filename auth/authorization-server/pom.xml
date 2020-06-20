@@ -78,7 +78,7 @@
                 <version>1.2.0</version>
                 <configuration>
                     <!-- 注意imageName一定要是符合正则[a-z0-9-_.]的，否则构建不会成功 -->
-                    <imageName>cike/${project.artifactId}</imageName>
+                    <imageName>10.0.0.102/java/${project.artifactId}</imageName>
                     <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
                     <rm>true</rm>
                     <resources>

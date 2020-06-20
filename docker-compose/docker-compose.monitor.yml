@@ -22,3 +22,6 @@ services:
     ports:
       - 8021:8021
     env_file: .env
+networks:
+  sc-net:
+    external: false

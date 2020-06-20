@@ -99,3 +99,6 @@ services:
       - sc-net
     ports:
       - 3000:3000
+networks:
+  sc-net:
+    external: false

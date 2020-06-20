@@ -27,3 +27,6 @@ services:
       - 8444:8444/tcp
     depends_on:
       - postgres
+networks:
+  sc-net:
+    external: false
