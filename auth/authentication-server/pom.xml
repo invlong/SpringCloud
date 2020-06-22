@@ -14,6 +14,16 @@
     <description>Demo Oauth2 project for Spring Cloud Oauth2 Authentication Server</description>
 
     <dependencies>
+        <!--注册中心-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!--配置中心-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-nacos-config</artifactId>
+        </dependency>
         <!--消息总线-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -49,6 +59,10 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
         <!--Redis缓存-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -81,6 +95,15 @@
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-starter-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+        </dependency>
+        <!--熔断降级-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -91,7 +114,6 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>build-info</goal>
                             <goal>repackage</goal>
                         </goals>
                     </execution>
