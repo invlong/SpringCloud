@@ -14,9 +14,9 @@ spring:
     lettuce:
       pool:
         max-active: 300
-    #password: ${REDIS_PASSWORD:123456}
+    password: ${REDIS_PASSWORD:123456}
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: ${DATASOURCE_DRIVER:com.mysql.jdbc.Driver}
     url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:3306}/sc_admin?characterEncoding=UTF-8&useUnicode=true&useSSL=false
     username: ${DATASOURCE_USERNAME:root}
     password: ${DATASOURCE_PASSWORD:root123}
@@ -75,6 +75,7 @@ jetcache:
         maxTotal: 50
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:123456}
     # 长时远程緩存，主要用于要求时效要求一般的集中式缓存
     longTime:
       type: redis
@@ -88,6 +89,7 @@ jetcache:
         maxTotal: 50
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:123456}
     # 短時远程緩存，主要用于要求时效较高的集中式缓存
     shortTime:
       type: redis
@@ -101,6 +103,7 @@ jetcache:
         maxTotal: 50
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:123456}
 
 management:
   endpoints:

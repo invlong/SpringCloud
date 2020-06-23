@@ -18,6 +18,7 @@ import java.util.List;
 @Slf4j
 public class SwaggerProvider implements SwaggerResourcesProvider {
     private static final String API_URI = "/v2/api-docs";
+    private static final String EXCLUDE = "auth";
 
     @Autowired
     private final RouteService routeService;
@@ -29,13 +30,22 @@ public class SwaggerProvider implements SwaggerResourcesProvider {
                 .forEach(routeDefinition -> routeDefinition.getPredicates().stream()
                         .filter(predicateDefinition -> "Path".equalsIgnoreCase(predicateDefinition.getName()))
                         .peek(predicateDefinition -> log.debug("路由配置参数：{}", predicateDefinition.getArgs()))
-                        .forEach(predicateDefinition -> resources.add(swaggerResource(routeDefinition.getId(),
-                                predicateDefinition.getArgs().get("pattern").replace("/**", API_URI)))));
+                        .forEach(predicateDefinition -> {
+                            SwaggerResource pattern = swaggerResource(routeDefinition.getId(),
+                                    predicateDefinition.getArgs().get("pattern").replace("/**", API_URI));
+                            if (null != pattern) {
+                                resources.add(pattern);
+                            }
+                        }));
         log.debug("resources:{}", resources);
         return resources;
     }
 
     private SwaggerResource swaggerResource(String name, String location) {
+        // 排除掉不需要的swagger
+        if (name.startsWith(EXCLUDE)) {
+            return null;
+        }
         SwaggerResource swaggerResource = new SwaggerResource();
         swaggerResource.setName(name);
         swaggerResource.setLocation(location);
