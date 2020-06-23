@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
+weds/
 *.iml
 data
 logs
