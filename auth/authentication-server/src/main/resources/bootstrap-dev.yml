@@ -1,0 +1,25 @@
+server:
+  port: 8011
+spring:
+  application:
+    name: authentication-server
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.0.0.110:8848
+        namespace: 352312ed-57d2-4e7c-b160-fe2b2f0dce6f
+      config:
+        server-addr: 10.0.0.110:8848
+        file-extension: yml
+        namespace: 352312ed-57d2-4e7c-b160-fe2b2f0dce6f
+        group: java
+        ext-config:
+          - data-id:
+              config-dev.yml
+            group:
+              common
+            refresh:
+              true
+    sentinel:
+      transport:
+        dashboard: 10.0.0.110:8021
