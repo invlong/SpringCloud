@@ -1,14 +1,16 @@
 package com.springboot.auth.authorization.config;
 
 import com.google.common.collect.Lists;
-import com.springboot.auth.authorization.oauth2.enhancer.CustomTokenEnhancer;
 import com.springboot.auth.authorization.exception.CustomWebResponseExceptionTranslator;
+import com.springboot.auth.authorization.oauth2.K12AuthenticationKeyGenerator;
+import com.springboot.auth.authorization.oauth2.enhancer.CustomTokenEnhancer;
 import com.springboot.auth.authorization.oauth2.granter.MobileTokenGranter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -27,7 +29,7 @@ import org.springframework.security.oauth2.provider.error.WebResponseExceptionTr
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -36,6 +38,10 @@ import java.util.List;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+    private static final String K12_PREFIX = "K12";
+
+    private static final String OAUTH_PREFIX = "OAUTH2";
 
     @Autowired
     @Qualifier("authenticationManagerBean")
@@ -48,6 +54,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     @Qualifier("userDetailsService")
     UserDetailsService userDetailsService;
+
+    @Autowired
+    private RedisConnectionFactory connectionFactory;
 
     /**
      * jwt 对称加密密钥
@@ -117,12 +126,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     /**
      * token的持久化
+     * 2020年06月28日增加自定义的token存入方式
      *
      * @return JwtTokenStore
      */
     @Bean
     public TokenStore tokenStore() {
-        return new JwtTokenStore(accessTokenConverter());
+        RedisTokenStore tokenStore = new RedisTokenStore(connectionFactory);
+        tokenStore.setPrefix(K12_PREFIX + OAUTH_PREFIX);
+        tokenStore.setAuthenticationKeyGenerator(new K12AuthenticationKeyGenerator());
+        return tokenStore;
     }
 
     /**

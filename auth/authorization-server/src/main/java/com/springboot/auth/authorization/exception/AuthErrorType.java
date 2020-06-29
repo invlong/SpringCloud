@@ -28,11 +28,11 @@ public enum AuthErrorType implements ErrorType {
     /**
      * 错误类型描述信息
      */
-    private String mesg;
+    private String msg;
 
     AuthErrorType(String code, String mesg) {
         this.code = code;
-        this.mesg = mesg;
+        this.msg = mesg;
     }
 
 }
