@@ -1,12 +1,22 @@
 server:
-  port: ${SERVER_PORT:8022}
+  port: 8022
 spring:
   application:
     name: admin
   cloud:
     nacos:
       discovery:
-        server-addr: ${REGISTER_HOST:localhost}:${REGISTER_PORT:8848}
+        server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
+        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
       config:
-        server-addr: ${REGISTER_HOST:localhost}:${REGISTER_PORT:8848}
+        server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         file-extension: yml
+        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        group: java
+        ext-config:
+          - data-id:
+              config-dev.yml
+            group:
+              common
+            refresh:
+              true
