@@ -27,3 +27,6 @@ services:
     env_file: .env
     environment:
       TZ: Asia/Shanghai
+networks:
+  sc-net:
+    external: false
