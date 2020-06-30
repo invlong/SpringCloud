@@ -16,13 +16,13 @@ import java.time.ZonedDateTime;
 @Getter
 public class Result<T> {
 
-    public static final String SUCCESSFUL_CODE = "000000";
+    public static final String SUCCESSFUL_CODE = "600";
     public static final String SUCCESSFUL_MESG = "处理成功";
 
     @ApiModelProperty(value = "处理结果code", required = true)
     private String code;
     @ApiModelProperty(value = "处理结果描述信息")
-    private String mesg;
+    private String msg;
     @ApiModelProperty(value = "请求结果生成时间戳")
     private Instant time;
     @ApiModelProperty(value = "处理结果数据信息")
@@ -38,7 +38,7 @@ public class Result<T> {
      */
     public Result(ErrorType errorType) {
         this.code = errorType.getCode();
-        this.mesg = errorType.getMesg();
+        this.msg = errorType.getMsg();
         this.time = ZonedDateTime.now().toInstant();
     }
 
@@ -55,12 +55,12 @@ public class Result<T> {
      * 内部使用，用于构造成功的结果
      *
      * @param code
-     * @param mesg
+     * @param msg
      * @param data
      */
-    private Result(String code, String mesg, T data) {
+    private Result(String code, String msg, T data) {
         this.code = code;
-        this.mesg = mesg;
+        this.msg = msg;
         this.data = data;
         this.time = ZonedDateTime.now().toInstant();
     }
