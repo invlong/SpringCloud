@@ -2,7 +2,7 @@ version: '3'
 services:
   #消息中心
   bus-server:
-    image: cike/bus-server:latest
+    image: 10.0.0.102/java/bus-server:latest
     container_name: sc-bus
     restart: always
     networks:
@@ -12,3 +12,6 @@ services:
     env_file: .env
     environment:
       TZ: Asia/Shanghai
+networks:
+  sc-net:
+    external: false
