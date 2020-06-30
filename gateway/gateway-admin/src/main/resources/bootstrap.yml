@@ -8,6 +8,7 @@ spring:
       discovery:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        group: ${REGISTER_GROUP:k12-dev}
       config:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         file-extension: yml
