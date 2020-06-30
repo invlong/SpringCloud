@@ -1,10 +1,8 @@
 package com.springboot.cloud.gateway.filter;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.springboot.cloud.auth.client.entity.dto.LoginParam;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
@@ -19,12 +17,9 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * 请求url权限校验
@@ -36,17 +31,6 @@ public class K12AccessGatewayFilter implements GlobalFilter {
 
     private static final String X_CLIENT_TOKEN_USER = "x-client-token-user";
     private static final String X_CLIENT_TOKEN = "x-client-token";
-
-    private static final String LOGIN_URL = "k12auth/login";
-    private static final String LOGIN_NAME = "username";
-    private static final String LOGIN_PASSWORD = "password";
-    private static final String LOGIN_SCHOOL_ID = "school_id";
-    private static final String LOGIN_ROLE_NO = "role_no";
-    private static final String LOGIN_CLIENT = "client";
-    private static final String LOGIN_GRANT_TYPE = "grant_type";
-    private static final String LOGIN_SCOPE = "scope";
-    private static final String USER_INFO_ROLE_LIST = "role_list";
-    private static final String USER_INFO_TOKEN = "token";
 
     /**
      * 由authentication-client模块提供签权的feign客户端
@@ -71,74 +55,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
         String authentication = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String method = request.getMethodValue();
         String url = request.getPath().value();
-        MultiValueMap<String, String> queryParams = request.getQueryParams();
         log.debug("url:{},method:{},headers:{}", url, method, request.getHeaders());
-        /*
-        特殊处理登录接口，先走登录逻辑，如果登陆者是单角色，增加access_token，
-        否则需要用户选择角色后，调用签权接口
-        */
-        if (url.endsWith(LOGIN_URL)) {
-            String username;
-            String password;
-            String client;
-            String grantType;
-            String scope;
-            Integer schoolId = null;
-            String roleNo = null;
-            if (queryParams.containsKey(LOGIN_NAME)) {
-                username = queryParams.getFirst(LOGIN_NAME);
-            } else {
-                return customResp(exchange, HttpStatus.UNAUTHORIZED, K12AuthErrorType.AUTH_WRONG_ACCOUNT.getMsg());
-            }
-            if (queryParams.containsKey(LOGIN_PASSWORD)) {
-                password = queryParams.getFirst(LOGIN_PASSWORD);
-            } else {
-                return customResp(exchange, HttpStatus.UNAUTHORIZED, K12AuthErrorType.AUTH_WRONG_ACCOUNT.getMsg());
-            }
-            if (queryParams.containsKey(LOGIN_CLIENT)) {
-                client = queryParams.getFirst(LOGIN_CLIENT);
-            } else {
-                return customResp(exchange, HttpStatus.UNAUTHORIZED, K12AuthErrorType.AUTH_WRONG_CLIENT.getMsg());
-            }
-            if (queryParams.containsKey(LOGIN_GRANT_TYPE)) {
-                grantType = queryParams.getFirst(LOGIN_GRANT_TYPE);
-            } else {
-                return customResp(exchange, HttpStatus.UNAUTHORIZED, K12AuthErrorType.AUTH_WRONG_TOKEN.getMsg());
-            }
-            if (queryParams.containsKey(LOGIN_SCOPE)) {
-                scope = queryParams.getFirst(LOGIN_SCOPE);
-            } else {
-                return customResp(exchange, HttpStatus.UNAUTHORIZED, K12AuthErrorType.AUTH_WRONG_TOKEN.getMsg());
-            }
-            if (queryParams.containsKey(LOGIN_SCHOOL_ID)) {
-                schoolId = Integer.valueOf(Objects.requireNonNull(queryParams.getFirst(LOGIN_SCHOOL_ID)));
-            }
-            if (queryParams.containsKey(LOGIN_ROLE_NO)) {
-                roleNo = queryParams.getFirst(LOGIN_ROLE_NO);
-            }
-            LoginParam loginParam = new LoginParam();
-            loginParam.setClient(client);
-            loginParam.setPassword(password);
-            loginParam.setRoleNo(roleNo);
-            loginParam.setSchoolId(schoolId);
-            loginParam.setUsername(username);
-            Result loginResult = authService.login(loginParam);
-            if (loginResult.isSuccess()) {
-                JSONObject loginData = JSONObject.parseObject(JSONObject.toJSONString(loginResult.getData()));
-                if (loginData.getJSONArray(USER_INFO_ROLE_LIST).size() == 1) {
-                    // 用户只有一个角色，那么调用授权服务
-                    Result tokenResult = authService.token(authentication, username, password, grantType, scope);
-                    if (tokenResult.isFail()) {
-                        // 失败直接返回授权失败
-                        return customResp(exchange, HttpStatus.UNAUTHORIZED, tokenResult.getMsg());
-                    }
-                    loginData.put(USER_INFO_TOKEN, JSONObject.toJSONString(tokenResult.getData()));
-                }
-                return customResp(exchange, HttpStatus.OK, JSONObject.toJSONString(loginData));
-            } else {
-                return customResp(exchange, HttpStatus.OK, JSONObject.toJSONString(loginResult.getData()));
-            }
-        }
         //不需要网关签权的url
         if (authService.ignoreAuthentication(url)) {
             return chain.filter(exchange);

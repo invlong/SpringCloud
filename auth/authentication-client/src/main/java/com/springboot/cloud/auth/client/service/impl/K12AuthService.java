@@ -1,10 +1,7 @@
 package com.springboot.cloud.auth.client.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.springboot.cloud.auth.client.entity.dto.LoginParam;
 import com.springboot.cloud.auth.client.provider.K12AuthProvider;
-import com.springboot.cloud.auth.client.provider.K12AuthorizationProvider;
-import com.springboot.cloud.auth.client.provider.K12NodeServerProvider;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.auth.client.utils.AESUtil;
 import com.springboot.cloud.common.core.entity.vo.Result;
@@ -45,12 +42,6 @@ public class K12AuthService implements IK12AuthService {
 
     @Autowired
     private K12AuthProvider k12AuthProvider;
-
-    @Autowired
-    private K12NodeServerProvider k12NodeServerProvider;
-
-    @Autowired
-    private K12AuthorizationProvider k12AuthorizationProvider;
 
     /**
      * jwt token 密钥，主要用于token解析，签名验证
@@ -124,24 +115,6 @@ public class K12AuthService implements IK12AuthService {
         return Jwts.parser()  //得到DefaultJwtParser
                 .setSigningKey(signingKey.getBytes()) //设置签名的秘钥
                 .parseClaimsJws(jwtToken);
-    }
-
-    @Override
-    public Result login(LoginParam param) {
-        return k12NodeServerProvider.login(param);
-    }
-
-    @Override
-    public Result token(String authentication, String username, String password, String grant_type, String scope) {
-        JSONObject data = k12AuthorizationProvider.token(authentication, username, password, grant_type, scope);
-        if (null != data && data.containsKey("access_token")) {
-            // 实现登录黑名单机制
-            return Result.success(data);
-        } else if (null == data) {
-            return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
-        } else {
-            return JSONObject.toJavaObject(data, Result.class);
-        }
     }
 
     @Override

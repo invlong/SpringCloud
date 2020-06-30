@@ -1,6 +1,5 @@
 package com.springboot.cloud.auth.client.service;
 
-import com.springboot.cloud.auth.client.entity.dto.LoginParam;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -66,22 +65,4 @@ public interface IK12AuthService {
      * @return Jws对象
      */
     Jws<Claims> getJwt(String jwtToken);
-
-    /**
-     * 登录接口，如果只有一个角色，获取token返回给前台，否则前台调用oauth2接口获取
-     * @param param
-     * @return
-     */
-    Result login(LoginParam param);
-
-    /**
-     * oauth2的授权接口,获取access token
-     * @param authentication
-     * @param username
-     * @param password
-     * @param grant_type
-     * @param scope
-     * @return
-     */
-    Result token(String authentication, String username, String password, String grant_type, String scope);
 }

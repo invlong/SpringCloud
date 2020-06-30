@@ -4,22 +4,22 @@ spring:
       trace:
         enabled: true
   rabbitmq:
-    host: ${RABBIT_MQ_HOST:localhost}
-    port: ${RABBIT_MQ_PORT:5672}
-    username: ${RABBIT_MQ_USERNAME:guest}
-    password: ${RABBIT_MQ_PASSWORD:guest}
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
   redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
+    host: ${redis.host}
+    port: ${redis.port}
     lettuce:
       pool:
         max-active: 300
-    password: ${REDIS_PASSWORD:123456}
+    password: ${redis.password}
   datasource:
-    driver-class-name: ${DATASOURCE_DRIVER:com.mysql.jdbc.Driver}
-    url: jdbc:${DATASOURCE_DBTYPE:mysql}://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:3306}/sc_admin?characterEncoding=UTF-8&useUnicode=true&useSSL=false
-    username: ${DATASOURCE_USERNAME:root}
-    password: ${DATASOURCE_PASSWORD:root123}
+    driver-class-name: ${database.driver-class-name}
+    url: jdbc:postgresql://${database.host}:${database.port}/sc_admin?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+    username: ${database.username}
+    password: ${database.password}
   zipkin:
     enabled: true
     sender:
@@ -73,9 +73,9 @@ jetcache:
         minIdle: 5
         maxIdle: 20
         maxTotal: 50
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:123456}
+      host: ${redis.host}
+      port: ${redis.port}
+      password: ${redis.password}
     # 长时远程緩存，主要用于要求时效要求一般的集中式缓存
     longTime:
       type: redis
@@ -87,9 +87,9 @@ jetcache:
         minIdle: 5
         maxIdle: 20
         maxTotal: 50
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:123456}
+      host: ${redis.host}
+      port: ${redis.port}
+      password: ${redis.password}
     # 短時远程緩存，主要用于要求时效较高的集中式缓存
     shortTime:
       type: redis
@@ -101,9 +101,9 @@ jetcache:
         minIdle: 5
         maxIdle: 20
         maxTotal: 50
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:123456}
+      host: ${redis.host}
+      port: ${redis.port}
+      password: ${redis.password}
 
 management:
   endpoints:
