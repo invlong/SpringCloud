@@ -222,46 +222,40 @@
 
     <repositories>
         <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>nexus</id>
+            <name>nexus</name>
+            <url>http://10.0.0.82:8081/repository/nexus/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
-
     <pluginRepositories>
         <pluginRepository>
-            <id>repository.spring.release</id>
-            <name>Spring GA Repository</name>
-            <url>https://repo.spring.io/plugins-release/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>jcenter-snapshots</id>
-            <name>jcenter</name>
-            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>jcenter-releases</id>
-            <name>jcenter</name>
-            <url>http://jcenter.bintray.com</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>nexus</id>
+            <name>nexus</name>
+            <url>http://10.0.0.82:8081/repository/nexus/</url>
         </pluginRepository>
     </pluginRepositories>
+    <distributionManagement>
+        <repository>
+            <id>weds-release</id>
+            <name>weds release resp</name>
+            <url>http://10.0.0.82:8081/repository/weds-release/</url>
+        </repository>
+        <snapshotRepository>
+            <id>weds-snapshots</id>
+            <name>weds snapshots resp</name>
+            <url>http://10.0.0.82:8081/repository/weds-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
@@ -285,8 +279,6 @@
         <module>gateway</module>
         <module>webapps</module>
         <module>monitor</module>
-        <module>sysadmin</module>
-        <module>demos</module>
         <module>weds</module>
     </modules>
 </project>
