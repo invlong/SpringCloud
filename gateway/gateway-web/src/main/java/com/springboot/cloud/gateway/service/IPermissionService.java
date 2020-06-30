@@ -1,5 +1,7 @@
 package com.springboot.cloud.gateway.service;
 
+import com.springboot.cloud.common.core.entity.vo.Result;
+
 public interface IPermissionService {
     /**
      * @param authentication
@@ -7,5 +9,5 @@ public interface IPermissionService {
      * @param url
      * @return
      */
-    boolean permission(String authentication, String url, String method);
+    Result permission(String authentication, String url, String method);
 }

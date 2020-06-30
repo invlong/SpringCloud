@@ -1,3 +1,25 @@
+server:
+  port: 8445
 spring:
-  profiles:
-    active: dev
+  application:
+    name: gateway-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
+        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+      config:
+        server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
+        file-extension: yml
+        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        group: java
+        ext-config:
+          - data-id:
+              config-dev.yml
+            group:
+              common
+            refresh:
+              true
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD_HOST:10.0.0.110}:${SENTINEL_DASHBOARD_PORT:8021}
