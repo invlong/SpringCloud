@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
-@FeignClient(name = "authentication-server", fallback = AuthProvider.AuthProviderFallback.class)
-public interface AuthProvider {
+@FeignClient(name = "authentication-server", fallback = K12AuthProvider.AuthProviderFallback.class)
+public interface K12AuthProvider {
     /**
      * 调用签权服务，判断用户是否有权限
      *
@@ -27,10 +27,10 @@ public interface AuthProvider {
      * </pre>
      */
     @PostMapping(value = "/auth/permission")
-    Result auth(@RequestHeader(HttpHeaders.AUTHORIZATION) String authentication, @RequestParam("url") String url, @RequestParam("method") String method);
+    Result auth(@RequestHeader(HttpHeaders.AUTHORIZATION) String authentication, @RequestParam("pdata") String pdata, @RequestParam("url") String url, @RequestParam("method") String method);
 
     @Component
-    class AuthProviderFallback implements AuthProvider {
+    class AuthProviderFallback implements K12AuthProvider {
         /**
          * 降级统一返回无权限
          *
@@ -46,7 +46,7 @@ public interface AuthProvider {
          * </pre>
          */
         @Override
-        public Result auth(String authentication, String url, String method) {
+        public Result auth(String authentication, String pdata, String url, String method) {
             return Result.fail();
         }
     }

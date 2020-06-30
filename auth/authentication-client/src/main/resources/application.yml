@@ -2,7 +2,7 @@ spring:
   security:
     oauth2:
       jwt:
-        signingKey: 123456
+        signingKey: ${jwt-custom.secret-key:123456}
 gate:
   ignore:
     authentication:
