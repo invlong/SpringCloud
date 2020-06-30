@@ -1,0 +1,17 @@
+version: '3'
+services:
+  #授权服务
+  k12-java-coreserver:
+    image: 10.0.0.102/java/k12-java-coreserver:latest
+    container_name: sc-k12-java-coreserver
+    restart: always
+    networks:
+      - sc-net
+    ports:
+      - 8061:8061
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+networks:
+  sc-net:
+    external: false
