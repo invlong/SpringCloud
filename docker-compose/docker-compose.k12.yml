@@ -14,7 +14,7 @@ services:
       TZ: Asia/Shanghai
     depends_on:
       - k12-java-appmerge
-  # web聚合服务
+  # app聚合服务
   k12-java-appmerge:
     image: 10.0.0.102/java/k12-java-appmerge:latest
     container_name: sc-k12-java-appmerge
@@ -23,6 +23,20 @@ services:
       - sc-net
     ports:
       - 18097:8097
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+    depends_on:
+      - k12-java-material
+  # 介质服务
+  k12-java-material:
+    image: 10.0.0.102/java/k12-java-material:latest
+    container_name: sc-k12-java-material
+    restart: always
+    networks:
+      - sc-net
+    ports:
+      - 19002:9002
     env_file: .env
     environment:
       TZ: Asia/Shanghai
