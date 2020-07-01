@@ -42,6 +42,20 @@ services:
       TZ: Asia/Shanghai
     depends_on:
       - k12-java-coreserver
+  # 访客服务
+  k12-java-visitor:
+    image: 10.0.0.102/java/k12-java-visitor:latest
+    container_name: sc-k12-java-visitor
+    restart: always
+    networks:
+      - sc-net
+    ports:
+      - 18094:8094
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+    depends_on:
+      - k12-java-coreserver
   # 核心业务服务
   k12-java-coreserver:
     image: 10.0.0.102/java/k12-java-coreserver:latest
