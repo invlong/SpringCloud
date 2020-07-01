@@ -69,9 +69,7 @@ services:
     environment:
       TZ: Asia/Shanghai
 
-#networks:
-#  sc-net:
-#    external: false
 networks:
   default:
-    driver: enp3s0
+    host:
+      external: false
