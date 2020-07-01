@@ -5,8 +5,8 @@ services:
     image: 10.0.0.102/java/k12-java-webmerge:latest
     container_name: sc-k12-java-webmerge
     restart: always
-#    networks:
-#      - sc-net
+    networks:
+      - sc-net
     ports:
       - 18096:8096
     env_file: .env
@@ -19,8 +19,8 @@ services:
     image: 10.0.0.102/java/k12-java-appmerge:latest
     container_name: sc-k12-java-appmerge
     restart: always
-#    networks:
-#      - sc-net
+    networks:
+      - sc-net
     ports:
       - 18097:8097
     env_file: .env
@@ -33,8 +33,8 @@ services:
     image: 10.0.0.102/java/k12-java-material:latest
     container_name: sc-k12-java-material
     restart: always
-#    networks:
-#      - sc-net
+    networks:
+      - sc-net
     ports:
       - 19002:9002
     env_file: .env
@@ -47,8 +47,8 @@ services:
     image: 10.0.0.102/java/k12-java-visitor:latest
     container_name: sc-k12-java-visitor
     restart: always
-#    networks:
-#      - sc-net
+    networks:
+      - sc-net
     ports:
       - 18094:8094
     env_file: .env
@@ -61,8 +61,8 @@ services:
     image: 10.0.0.102/java/k12-java-coreserver:latest
     container_name: sc-k12-java-coreserver
     restart: always
-#    networks:
-#      - sc-net
+    networks:
+      - sc-net
     ports:
       - 18061:8061
     env_file: .env
@@ -70,5 +70,5 @@ services:
       TZ: Asia/Shanghai
 
 networks:
-  default:
-    driver: host
+  sc-net:
+    external: false
