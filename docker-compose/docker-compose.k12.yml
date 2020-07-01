@@ -71,5 +71,4 @@ services:
 
 networks:
   default:
-    host:
-      external: false
+    driver: host
