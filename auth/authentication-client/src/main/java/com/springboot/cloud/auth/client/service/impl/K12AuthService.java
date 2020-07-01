@@ -1,19 +1,19 @@
 package com.springboot.cloud.auth.client.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.springboot.cloud.auth.client.provider.K12AuthProvider;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
-import com.springboot.cloud.auth.client.utils.AESUtil;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
+import com.weds.framework.auth.service.JWTService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
@@ -21,18 +21,13 @@ import java.util.stream.Stream;
 @Slf4j
 public class K12AuthService implements IK12AuthService {
 
+    @Autowired
+    private JWTService jwtService;
+
     /**
      * Authorization认证开头是"bearer "
      */
     private static final String BEARER = "Bearer ";
-
-    private static final String AUD = "aud";
-
-    private static final String JTI = "jti";
-
-    private static final String CLIENT = "client";
-
-    private static final String PDATA = "pdata";
 
     /**
      * Authorization认证开头是"Token "
@@ -91,20 +86,33 @@ public class K12AuthService implements IK12AuthService {
             log.error("非法请求，请求头不包含token");
             return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
         }
-        Object pdata = null;
-        //token是否有效，在网关进行校验，无效/过期等
-        Result invalidTokenResp = invalidJwtAccessToken(authentication);
-        if (invalidTokenResp.isFail()) {
-            // 二次校验之前的签发格式的token
-            Result invalidK12TokenResp = this.invalidK12JwtAccessToken(authentication);
-            if (invalidK12TokenResp.isFail()) {
-                return invalidTokenResp;
-            } else {
-                pdata = invalidTokenResp.getData();
-            }
+        String jwtData;
+        try {
+            jwtData = jwtService.authorizationToken(authentication);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error(ExceptionUtils.getStackTrace(e));
+            log.error("解析token发生异常");
+            return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
         }
-        // 调用鉴权服务，判断redis黑名单
-        return authenticate(authentication, null == pdata ? null : String.valueOf(pdata), url, method);
+        if (jwtData.length() == 1) {
+            switch (jwtData) {
+                case "1":
+                    log.debug("登录时效已过期，请重新登录");
+                    return Result.fail(K12AuthErrorType.AUTH_EXPIRE);
+                case "2":
+                    log.debug("账号权限有变动，请重新登录");
+                    return Result.fail(K12AuthErrorType.AUTH_ROLE_CHANGE);
+                case "3":
+                    log.debug("账号在别处登录，请重新登录");
+                    return Result.fail(K12AuthErrorType.AUTH_RE_LOGIN);
+                default:
+                    log.debug("非法请求");
+                    return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
+            }
+        } else {
+            return Result.success(jwtData);
+        }
     }
 
     @Override
@@ -138,42 +146,6 @@ public class K12AuthService implements IK12AuthService {
             log.error("非法请求，请求头不包含token或者token过短不超过15位");
             return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
 
-        }
-    }
-
-    @Override
-    public Result invalidK12JwtAccessToken(String authentication) {
-        if (authentication.length() > 15) {
-            StringTokenizer st = new StringTokenizer(authentication);
-            if (st.hasMoreTokens()) {
-                String basic = st.nextToken();
-                log.debug(basic);
-                String credentials = new String(java.util.Base64.getDecoder().decode(st.nextToken()), StandardCharsets.UTF_8);
-                try {
-                    Claims claims = Jwts.parser()
-                            .setSigningKey(signingKey.getBytes())
-                            .parseClaimsJws(credentials).getBody();
-                    String pdata = claims.get(PDATA).toString();
-                    String aud = claims.get(AUD).toString();
-                    // 解密pdata
-                    String pdataStr = AESUtil.decrypt(pdata, aesKey, aesValue);
-                    JSONObject pdataJson = JSONObject.parseObject(pdataStr);
-                    pdataJson.put(CLIENT, aud);
-                    pdataJson.put(JTI, authentication);
-                    return Result.success(pdataJson.toJSONString());
-                } catch (SignatureException | ExpiredJwtException | MalformedJwtException ex) {
-                    ex.printStackTrace();
-                    log.error("user token error :{}", ex.getMessage());
-                    log.error("Token过期");
-                    return Result.fail(K12AuthErrorType.AUTH_EXPIRE);
-                }
-            } else {
-                log.error("非法请求，token格式错误");
-                return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
-            }
-        } else {
-            log.error("非法请求，请求头不包含token或者token过短不超过15位");
-            return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
         }
     }
 }

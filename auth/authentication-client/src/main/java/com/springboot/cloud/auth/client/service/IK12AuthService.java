@@ -52,13 +52,6 @@ public interface IK12AuthService {
     Result invalidJwtAccessToken(String authentication);
 
     /**
-     * 旧token的解析方法
-     * @param authentication
-     * @return
-     */
-    Result invalidK12JwtAccessToken(String authentication);
-
-    /**
      * 从认证信息中提取jwt token 对象
      *
      * @param jwtToken toke信息 header.payload.signature
