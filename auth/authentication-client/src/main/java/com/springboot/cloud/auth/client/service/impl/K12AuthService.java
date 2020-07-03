@@ -1,18 +1,21 @@
 package com.springboot.cloud.auth.client.service.impl;
 
+import com.springboot.cloud.auth.client.config.JWTProperties;
 import com.springboot.cloud.auth.client.provider.K12AuthProvider;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
+import com.springboot.cloud.auth.client.utils.JWTService;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
-import com.weds.framework.auth.service.JWTService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
@@ -20,9 +23,6 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 public class K12AuthService implements IK12AuthService {
-
-    @Autowired
-    private JWTService jwtService;
 
     /**
      * Authorization认证开头是"bearer "
@@ -63,6 +63,12 @@ public class K12AuthService implements IK12AuthService {
     @Value("${spring.security.oauth2.jwt.aesValue}")
     private String aesValue;
 
+    @Autowired
+    private JWTProperties jwtProperties;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     @Override
     public Result authenticate(String authentication, String pdata, String url, String method) {
         return k12AuthProvider.auth(authentication, pdata, url, method);
@@ -88,7 +94,7 @@ public class K12AuthService implements IK12AuthService {
         }
         String jwtData;
         try {
-            jwtData = jwtService.authorizationToken(authentication);
+            jwtData = JWTService.authorizationToken(authentication, jwtProperties, stringRedisTemplate);
         } catch (IOException e) {
             e.printStackTrace();
             log.error(ExceptionUtils.getStackTrace(e));

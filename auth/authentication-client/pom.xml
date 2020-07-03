@@ -26,11 +26,6 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-okhttp</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.springboot.cloud</groupId>
-            <artifactId>k12-auth</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <!--oauth2认证-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -46,5 +41,16 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.14</version>
+        </dependency>
+
+
     </dependencies>
 </project>
