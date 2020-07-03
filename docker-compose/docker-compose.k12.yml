@@ -56,6 +56,20 @@ services:
       TZ: Asia/Shanghai
     depends_on:
       - k12-java-coreserver
+  # 进出服务
+  k12-java-leave:
+    image: 10.0.0.102/java/k12-java-leave:latest
+    container_name: sc-k12-java-leave
+    restart: always
+    networks:
+      - sc-net
+    ports:
+      - 8021:8021
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+    depends_on:
+      - k12-java-coreserver
   # 核心业务服务
   k12-java-coreserver:
     image: 10.0.0.102/java/k12-java-coreserver:latest
