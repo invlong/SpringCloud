@@ -96,22 +96,16 @@ public class K12AccessGatewayFilter implements GlobalFilter {
         }
         // 增加鉴权失败错误提示
         HttpStatus code;
-        switch (K12AuthErrorType.valueOf(permission.getCode())) {
-            case AUTH_EXPIRE:
-                code = HttpStatus.NOT_ACCEPTABLE;
-                break;
-            case AUTH_RE_LOGIN:
-                code = HttpStatus.UNAUTHORIZED;
-                break;
-            case AUTH_ROLE_CHANGE:
-                code = HttpStatus.UNAUTHORIZED;
-                break;
-            case AUTH_WRONG_TOKEN:
-                code = HttpStatus.UNAUTHORIZED;
-                break;
-            default:
-                code = HttpStatus.UNAUTHORIZED;
-                break;
+        if (permission.getCode().equals(K12AuthErrorType.AUTH_EXPIRE.getCode())) {
+            code = HttpStatus.NOT_ACCEPTABLE;
+        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_RE_LOGIN.getCode())) {
+            code = HttpStatus.UNAUTHORIZED;
+        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_ROLE_CHANGE.getCode())) {
+            code = HttpStatus.UNAUTHORIZED;
+        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_WRONG_TOKEN.getCode())) {
+            code = HttpStatus.UNAUTHORIZED;
+        } else {
+            code = HttpStatus.UNAUTHORIZED;
         }
         return customResp(exchange, code, permission.getMsg());
     }
@@ -152,9 +146,11 @@ public class K12AccessGatewayFilter implements GlobalFilter {
      * @return
      */
     private Mono<Void> customResp(ServerWebExchange serverWebExchange, HttpStatus code, String tip) {
+        log.debug(tip);
         serverWebExchange.getResponse().setStatusCode(null == code ? HttpStatus.UNAUTHORIZED : code);
-        DataBuffer buffer = serverWebExchange.getResponse()
-                .bufferFactory().wrap(Strings.isNullOrEmpty(tip) ? HttpStatus.UNAUTHORIZED.getReasonPhrase().getBytes() : tip.getBytes());
+        DataBuffer buffer = null;
+        buffer = serverWebExchange.getResponse()
+                .bufferFactory().wrap(Strings.isNullOrEmpty(tip) ? HttpStatus.UNAUTHORIZED.getReasonPhrase().getBytes() : tip.getBytes(StandardCharsets.UTF_8));
         return serverWebExchange.getResponse().writeWith(Flux.just(buffer));
     }
 }
