@@ -1,7 +1,7 @@
 package com.springboot.cloud.auth.client.service.impl;
 
 import com.springboot.cloud.auth.client.config.JWTProperties;
-import com.springboot.cloud.auth.client.provider.K12AuthProvider;
+//import com.springboot.cloud.auth.client.provider.K12AuthProvider;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.auth.client.utils.JWTService;
 import com.springboot.cloud.common.core.entity.vo.Result;
@@ -34,8 +34,8 @@ public class K12AuthService implements IK12AuthService {
      */
     private static final String TOKEN = "Token ";
 
-    @Autowired
-    private K12AuthProvider k12AuthProvider;
+//    @Autowired
+//    private K12AuthProvider k12AuthProvider;
 
     /**
      * jwt token 密钥，主要用于token解析，签名验证
@@ -68,10 +68,10 @@ public class K12AuthService implements IK12AuthService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Override
-    public Result authenticate(String authentication, String pdata, String url, String method) {
-        return k12AuthProvider.auth(authentication, pdata, url, method);
-    }
+//    @Override
+//    public Result authenticate(String authentication, String pdata, String url, String method) {
+//        return k12AuthProvider.auth(authentication, pdata, url, method);
+//    }
 
     @Override
     public boolean ignoreAuthentication(String url) {

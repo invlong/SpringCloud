@@ -14,7 +14,7 @@ public interface IK12AuthService {
      * @param method
      * @return Result
      */
-    Result authenticate(String authentication, String pdata, String url, String method);
+//    Result authenticate(String authentication, String pdata, String url, String method);
 
     /**
      * 判断url是否在忽略的范围内
