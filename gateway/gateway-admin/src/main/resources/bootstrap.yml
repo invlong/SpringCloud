@@ -7,12 +7,12 @@ spring:
     nacos:
       discovery:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
-        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        namespace: ${REGISTER_NAMESPACE:aba811bc-87ee-4179-92a5-398b5684d55c}
         group: ${REGISTER_GROUP:k12-dev}
       config:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         file-extension: yml
-        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        namespace: ${CONFIG_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
         group: java
         ext-config:
           - data-id:

@@ -7,7 +7,7 @@ spring:
     nacos:
       discovery:
         server-addr: ${REGISTER_HOST:localhost}:${REGISTER_PORT:8848}
-        namespace: ${REGISTER_NAMESPACE:352312ed-57d2-4e7c-b160-fe2b2f0dce6f}
+        namespace: ${REGISTER_NAMESPACE:aba811bc-87ee-4179-92a5-398b5684d55c}
         group: ${REGISTER_GROUP:k12-dev}
       config:
         server-addr: ${REGISTER_HOST:localhost}:${REGISTER_PORT:8848}
