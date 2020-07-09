@@ -23,4 +23,4 @@ spring:
               true
     sentinel:
       transport:
-        dashboard: ${SENTINEL_DASHBOARD_HOST:10.0.0.110}:${SENTINEL_DASHBOARD_PORT:8021}
+        dashboard: ${SENTINEL_DASHBOARD_HOST:10.0.0.110}:${SENTINEL_DASHBOARD_PORT:18021}
