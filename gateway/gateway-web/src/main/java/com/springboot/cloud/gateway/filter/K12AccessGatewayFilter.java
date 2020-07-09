@@ -38,6 +38,11 @@ public class K12AccessGatewayFilter implements GlobalFilter {
     private static final String X_CLIENT_TOKEN_USER = "x-client-token-user";
     private static final String X_CLIENT_TOKEN = "x-client-token";
     private static final String JWT_SCHOOL_ID = "schoolId";
+    private static final String UTF8_HEADER = "text/plain;charset=UTF-8";
+    private static final String UNAUTHORIZED_TIMESTAMP = "timestamp";
+    private static final String UNAUTHORIZED_STATUS = "status";
+    private static final String UNAUTHORIZED_ERROR = "error";
+    private static final String UNAUTHORIZED_MESSAGE = "message";
 
     /**
      * 由authentication-client模块提供签权的feign客户端
@@ -107,7 +112,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
         } else {
             code = HttpStatus.UNAUTHORIZED;
         }
-        return customResp(exchange, code, permission.getMsg());
+        return unauthorizedResp(exchange, code, permission.getMsg());
     }
 
     private static boolean isJSON(String str) {
@@ -145,12 +150,26 @@ public class K12AccessGatewayFilter implements GlobalFilter {
      * @param tip
      * @return
      */
-    private Mono<Void> customResp(ServerWebExchange serverWebExchange, HttpStatus code, String tip) {
+    private Mono<Void> unauthorizedResp(ServerWebExchange serverWebExchange, HttpStatus code, String tip) {
         log.debug(tip);
+        /*{
+            "timestamp": 1594282058018,
+                "status": 401,
+                "error": "Unauthorized",
+                "message": "账号在别处登录，请重新登录",
+                "path": "/bepf/user/get_student_list_by_dept"
+        }*/
+        // 兼容旧的格式
+        JSONObject respJson = new JSONObject();
+        respJson.put(UNAUTHORIZED_TIMESTAMP, System.currentTimeMillis());
+        respJson.put(UNAUTHORIZED_STATUS, null == code ? HttpStatus.UNAUTHORIZED.value() : code.value());
+        respJson.put(UNAUTHORIZED_ERROR, HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        respJson.put(UNAUTHORIZED_MESSAGE, Strings.isNullOrEmpty(tip) ? HttpStatus.UNAUTHORIZED.getReasonPhrase() : tip);
         serverWebExchange.getResponse().setStatusCode(null == code ? HttpStatus.UNAUTHORIZED : code);
-        DataBuffer buffer = null;
+        serverWebExchange.getResponse().getHeaders().add(HttpHeaders.CONTENT_TYPE, UTF8_HEADER);
+        DataBuffer buffer;
         buffer = serverWebExchange.getResponse()
-                .bufferFactory().wrap(Strings.isNullOrEmpty(tip) ? HttpStatus.UNAUTHORIZED.getReasonPhrase().getBytes() : tip.getBytes(StandardCharsets.UTF_8));
+                .bufferFactory().wrap(respJson.toJSONString().getBytes(StandardCharsets.UTF_8));
         return serverWebExchange.getResponse().writeWith(Flux.just(buffer));
     }
 }
