@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("com.springboot.cloud.auth.client")
-@EnableConfigurationProperties({JWTProperties.class})
+@EnableConfigurationProperties({JWTProperties.class, NodeNestWhiteListConfig.class, NodeServerWhiteListConfig.class})
 public class AuthAutoConfiguration {
 
 

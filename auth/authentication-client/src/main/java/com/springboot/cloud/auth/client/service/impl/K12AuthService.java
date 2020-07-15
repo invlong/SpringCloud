@@ -1,7 +1,8 @@
 package com.springboot.cloud.auth.client.service.impl;
 
 import com.springboot.cloud.auth.client.config.JWTProperties;
-//import com.springboot.cloud.auth.client.provider.K12AuthProvider;
+import com.springboot.cloud.auth.client.config.NodeNestWhiteListConfig;
+import com.springboot.cloud.auth.client.config.NodeServerWhiteListConfig;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.auth.client.utils.JWTService;
 import com.springboot.cloud.common.core.entity.vo.Result;
@@ -15,9 +16,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
+
+//import com.springboot.cloud.auth.client.provider.K12AuthProvider;
 
 @Service
 @Slf4j
@@ -66,16 +72,102 @@ public class K12AuthService implements IK12AuthService {
     private JWTProperties jwtProperties;
 
     @Autowired
+    private NodeNestWhiteListConfig nodeWhiteListConfig;
+
+    @Autowired
+    private NodeServerWhiteListConfig nodeServerWhiteListConfig;
+
+    @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-//    @Override
-//    public Result authenticate(String authentication, String pdata, String url, String method) {
-//        return k12AuthProvider.auth(authentication, pdata, url, method);
-//    }
+    //封装，不需要过滤的list列表
+    private static List<Pattern> patterns = new ArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        // Java配置中的白名单
+        String[] filters = ignoreUrls.split(",");
+        patterns.add(Pattern.compile("v2/api-docs.*"));
+        patterns.add(Pattern.compile("configuration/ui.*"));
+        patterns.add(Pattern.compile("swagger-resources.*"));
+        patterns.add(Pattern.compile("configuration/security.*"));
+        patterns.add(Pattern.compile("swagger-ui.html"));
+        patterns.add(Pattern.compile("spec"));
+        patterns.add(Pattern.compile("healthy"));
+        patterns.add(Pattern.compile("webjars.*"));
+        for (String filter : filters) {
+            patterns.add(Pattern.compile(filter));
+        }
+        // node配置中的白名单
+        if (null != nodeWhiteListConfig.getGET() && nodeWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nodeWhiteListConfig.getGET()) {
+                String newStr = getStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getPOST() && nodeWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nodeWhiteListConfig.getPOST()) {
+                String newStr = postStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getPUT() && nodeWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nodeWhiteListConfig.getPUT()) {
+                String newStr = putStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getDELETE() && nodeWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nodeWhiteListConfig.getDELETE()) {
+                String newStr = delStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getGET() && nodeServerWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nodeServerWhiteListConfig.getGET()) {
+                String newStr = getStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getPOST() && nodeServerWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nodeServerWhiteListConfig.getPOST()) {
+                String newStr = postStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getPUT() && nodeServerWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nodeServerWhiteListConfig.getPUT()) {
+                String newStr = putStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getDELETE() && nodeServerWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nodeServerWhiteListConfig.getDELETE()) {
+                String newStr = delStr.replace("/^", "^").replace("\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+    }
 
     @Override
     public boolean ignoreAuthentication(String url) {
-        return Stream.of(this.ignoreUrls.split(",")).anyMatch(ignoreUrl -> url.startsWith(StringUtils.trim(ignoreUrl)));
+        return patterns.stream().anyMatch(pattern -> pattern.matcher(url).matches());
     }
 
     @Override
