@@ -101,15 +101,15 @@ public class K12AuthService implements IK12AuthService {
         // node配置中的白名单
         if (null != nodeWhiteListConfig.getGET() && nodeWhiteListConfig.getGET().size() > 0) {
             for (String getStr : nodeWhiteListConfig.getGET()) {
-                String newStr = getStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
+                log.debug(finalStr);
                 patterns.add(Pattern.compile(finalStr));
             }
         }
         if (null != nodeWhiteListConfig.getPOST() && nodeWhiteListConfig.getPOST().size() > 0) {
             for (String postStr : nodeWhiteListConfig.getPOST()) {
-                String newStr = postStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -117,7 +117,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeWhiteListConfig.getPUT() && nodeWhiteListConfig.getPUT().size() > 0) {
             for (String putStr : nodeWhiteListConfig.getPUT()) {
-                String newStr = putStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -125,7 +125,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeWhiteListConfig.getDELETE() && nodeWhiteListConfig.getDELETE().size() > 0) {
             for (String delStr : nodeWhiteListConfig.getDELETE()) {
-                String newStr = delStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -133,7 +133,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeServerWhiteListConfig.getGET() && nodeServerWhiteListConfig.getGET().size() > 0) {
             for (String getStr : nodeServerWhiteListConfig.getGET()) {
-                String newStr = getStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -141,7 +141,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeServerWhiteListConfig.getPOST() && nodeServerWhiteListConfig.getPOST().size() > 0) {
             for (String postStr : nodeServerWhiteListConfig.getPOST()) {
-                String newStr = postStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -149,7 +149,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeServerWhiteListConfig.getPUT() && nodeServerWhiteListConfig.getPUT().size() > 0) {
             for (String putStr : nodeServerWhiteListConfig.getPUT()) {
-                String newStr = putStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -157,7 +157,7 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeServerWhiteListConfig.getDELETE() && nodeServerWhiteListConfig.getDELETE().size() > 0) {
             for (String delStr : nodeServerWhiteListConfig.getDELETE()) {
-                String newStr = delStr.replace("/^", "^").replace("\\/", "/");
+                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
@@ -167,7 +167,12 @@ public class K12AuthService implements IK12AuthService {
 
     @Override
     public boolean ignoreAuthentication(String url) {
-        return patterns.stream().anyMatch(pattern -> pattern.matcher(url).matches());
+        return patterns.stream().anyMatch(pattern -> {
+            if (pattern.matcher(url).matches()) {
+                log.debug("匹配的pattern:{}", pattern.toString());
+            }
+            return pattern.matcher(url).matches();
+        });
     }
 
     @Override
