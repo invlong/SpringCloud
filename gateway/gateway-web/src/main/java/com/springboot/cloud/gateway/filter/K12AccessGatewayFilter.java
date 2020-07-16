@@ -2,7 +2,6 @@ package com.springboot.cloud.gateway.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.common.util.HttpMethod;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -17,7 +16,6 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -76,27 +74,12 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                 Result permission = permissionService.permission(authentication, url, method);
                 if (permission.isSuccess()) {
                     JSONObject userData = JSON.parseObject(String.valueOf(permission.getData()));
-                    if ((!userData.containsKey(JWT_SCHOOL_ID) || userData.getInteger(JWT_SCHOOL_ID) < 10) && method.equalsIgnoreCase(HttpMethod.POST)) {
-                        log.debug("token中不含有学校id，尝试从body中获取");
-                        Flux<DataBuffer> requestBody = exchange.getRequest().getBody();
-                        requestBody.subscribe(buffer -> {
-                            byte[] bytes = new byte[buffer.readableByteCount()];
-                            buffer.read(bytes);
-                            DataBufferUtils.release(buffer);
-                            String body = new String(bytes, StandardCharsets.UTF_8);
-                            if (!Strings.isNullOrEmpty(body) && isJSON(body)) {
-                                JSONObject jsonBody = JSONObject.parseObject(body);
-                                if (jsonBody.containsKey(JWT_SCHOOL_ID)) {
-                                    userData.put(JWT_SCHOOL_ID, jsonBody.getInteger(JWT_SCHOOL_ID));
-                                }
-                            }
-                        });
-                    }
                     ServerHttpRequest.Builder builder = request.mutate();
                     //TODO 转发的请求都加上服务间认证token
                     builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
                     //将jwt token中的用户信息传给服务
                     builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
+                    log.debug("转发请求");
                     return chain.filter(exchange.mutate().request(builder.build()).build());
                 } else {
                     log.debug("给的token解析失败，不存入用户信息");
@@ -108,27 +91,12 @@ public class K12AccessGatewayFilter implements GlobalFilter {
         Result permission = permissionService.permission(authentication, url, method);
         if (permission.isSuccess()) {
             JSONObject userData = JSON.parseObject(String.valueOf(permission.getData()));
-            if ((!userData.containsKey(JWT_SCHOOL_ID) || userData.getInteger(JWT_SCHOOL_ID) < 10) && method.equalsIgnoreCase(HttpMethod.POST)) {
-                log.debug("token中不含有学校id，尝试从body中获取");
-                Flux<DataBuffer> requestBody = exchange.getRequest().getBody();
-                requestBody.subscribe(buffer -> {
-                    byte[] bytes = new byte[buffer.readableByteCount()];
-                    buffer.read(bytes);
-                    DataBufferUtils.release(buffer);
-                    String body = new String(bytes, StandardCharsets.UTF_8);
-                    if (!Strings.isNullOrEmpty(body) && isJSON(body)) {
-                        JSONObject jsonBody = JSONObject.parseObject(body);
-                        if (jsonBody.containsKey(JWT_SCHOOL_ID)) {
-                            userData.put(JWT_SCHOOL_ID, jsonBody.getInteger(JWT_SCHOOL_ID));
-                        }
-                    }
-                });
-            }
             ServerHttpRequest.Builder builder = request.mutate();
             //TODO 转发的请求都加上服务间认证token
             builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
             //将jwt token中的用户信息传给服务
             builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
+            log.debug("转发请求");
             return chain.filter(exchange.mutate().request(builder.build()).build());
         }
         // 增加鉴权失败错误提示
