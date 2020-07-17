@@ -16,11 +16,14 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class CorsConfiguration {
 
-    private static final String ALLOWED_HEADERS = "*";
-    private static final String ALLOWED_METHODS = "*";
+    private static final String ALLOWED_HEADERS = "User-Agent,Origin,Cache-Control,Content-type,Date,Server,withCredentials,authorization";
+    private static final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";
     private static final String ALLOWED_ORIGIN = "*";
-    private static final String ALLOWED_EXPOSE = "*";
+    private static final String ALLOWED_EXPOSE = "accesstoken";
     private static final String MAX_AGE = "3600";
+    private static final String CACHE = "no-cache";
+    private static final String EXPIRES = "-1";
+    private static final String CREDENTIALS = "true";
 
     @Bean
     public WebFilter corsFilter() {
@@ -30,11 +33,15 @@ public class CorsConfiguration {
                 ServerHttpResponse response = ctx.getResponse();
                 HttpHeaders headers = response.getHeaders();
                 headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+                headers.add("Access-Control-Allow-Headers", ALLOWED_HEADERS);
+                headers.add("Access-Control-Allow-Credentials", CREDENTIALS);
                 headers.add("Access-Control-Allow-Methods", ALLOWED_METHODS);
                 headers.add("Access-Control-Max-Age", MAX_AGE);
-                headers.add("Access-Control-Allow-Headers", ALLOWED_HEADERS);
                 headers.add("Access-Control-Expose-Headers", ALLOWED_EXPOSE);
-                headers.add("Access-Control-Allow-Credentials", "true");
+                headers.add("Access-Control-Request-Headers", ALLOWED_EXPOSE);
+                headers.add("pragma", CACHE);
+                headers.add("Expires", EXPIRES);
+                headers.add("Cache-Control", CACHE);
                 if (request.getMethod() == HttpMethod.OPTIONS) {
                     response.setStatusCode(HttpStatus.OK);
                     return Mono.empty();
