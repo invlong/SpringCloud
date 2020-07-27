@@ -10,6 +10,8 @@ import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
 import com.springboot.cloud.gateway.service.IPermissionService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -62,6 +64,16 @@ public class K12AccessGatewayFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        String reqContextId = request.getHeaders().getFirst(GlobalTraceIdContext.REQUESTID_HEADER_KEY);
+        if (StringUtils.isNotBlank(reqContextId)) {
+            MDC.put(GlobalTraceIdContext.REQUESTID_HEADER_KEY, reqContextId);
+        } else {
+            reqContextId = GlobalTraceIdContext.getUUID();
+            MDC.put(GlobalTraceIdContext.REQUESTID_HEADER_KEY, reqContextId);
+        }
+        GlobalTraceIdContext.setRequestId(reqContextId);
+        String finalReqContextId = reqContextId;
+        log.info("finalReqContextId is {}",finalReqContextId);
         String authentication = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String method = request.getMethodValue();
         String url = request.getPath().value();
@@ -77,6 +89,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                     ServerHttpRequest.Builder builder = request.mutate();
                     //TODO 转发的请求都加上服务间认证token
                     builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
+                    builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
                     //将jwt token中的用户信息传给服务
                     builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
                     log.debug("转发请求");
@@ -94,6 +107,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
             ServerHttpRequest.Builder builder = request.mutate();
             //TODO 转发的请求都加上服务间认证token
             builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
+            builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
             //将jwt token中的用户信息传给服务
             builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
             log.debug("转发请求");
