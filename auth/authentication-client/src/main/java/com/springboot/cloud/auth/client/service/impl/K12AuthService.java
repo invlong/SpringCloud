@@ -85,8 +85,6 @@ public class K12AuthService implements IK12AuthService {
 
     @PostConstruct
     public void init() {
-        // Java配置中的白名单
-        String[] filters = ignoreUrls.split(",");
         patterns.add(Pattern.compile("v2/api-docs.*"));
         patterns.add(Pattern.compile("configuration/ui.*"));
         patterns.add(Pattern.compile("swagger-resources.*"));
@@ -95,74 +93,10 @@ public class K12AuthService implements IK12AuthService {
         patterns.add(Pattern.compile("spec"));
         patterns.add(Pattern.compile("healthy"));
         patterns.add(Pattern.compile("webjars.*"));
-        for (String filter : filters) {
-            patterns.add(Pattern.compile(filter));
-        }
-        // node配置中的白名单
-        if (null != nodeWhiteListConfig.getGET() && nodeWhiteListConfig.getGET().size() > 0) {
-            for (String getStr : nodeWhiteListConfig.getGET()) {
-                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.debug(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeWhiteListConfig.getPOST() && nodeWhiteListConfig.getPOST().size() > 0) {
-            for (String postStr : nodeWhiteListConfig.getPOST()) {
-                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeWhiteListConfig.getPUT() && nodeWhiteListConfig.getPUT().size() > 0) {
-            for (String putStr : nodeWhiteListConfig.getPUT()) {
-                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeWhiteListConfig.getDELETE() && nodeWhiteListConfig.getDELETE().size() > 0) {
-            for (String delStr : nodeWhiteListConfig.getDELETE()) {
-                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeServerWhiteListConfig.getGET() && nodeServerWhiteListConfig.getGET().size() > 0) {
-            for (String getStr : nodeServerWhiteListConfig.getGET()) {
-                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeServerWhiteListConfig.getPOST() && nodeServerWhiteListConfig.getPOST().size() > 0) {
-            for (String postStr : nodeServerWhiteListConfig.getPOST()) {
-                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeServerWhiteListConfig.getPUT() && nodeServerWhiteListConfig.getPUT().size() > 0) {
-            for (String putStr : nodeServerWhiteListConfig.getPUT()) {
-                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
-        if (null != nodeServerWhiteListConfig.getDELETE() && nodeServerWhiteListConfig.getDELETE().size() > 0) {
-            for (String delStr : nodeServerWhiteListConfig.getDELETE()) {
-                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
-                String finalStr = newStr.substring(0, newStr.length() - 2);
-                log.info(finalStr);
-                patterns.add(Pattern.compile(finalStr));
-            }
-        }
+        // node白名单
+        initNodeWhiteList();
+        // java白名单
+        initJavaWhiteList();
     }
 
     @Override
@@ -248,6 +182,82 @@ public class K12AuthService implements IK12AuthService {
             log.error("非法请求，请求头不包含token或者token过短不超过15位");
             return Result.fail(K12AuthErrorType.AUTH_WRONG_TOKEN);
 
+        }
+    }
+
+    private void initJavaWhiteList() {
+        // Java配置中的白名单
+        String[] filters = ignoreUrls.split(",");
+        for (String filter : filters) {
+            patterns.add(Pattern.compile(filter));
+        }
+    }
+
+    private void initNodeWhiteList() {
+        // node配置中的白名单
+        if (null != nodeWhiteListConfig.getGET() && nodeWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nodeWhiteListConfig.getGET()) {
+                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.debug(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getPOST() && nodeWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nodeWhiteListConfig.getPOST()) {
+                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getPUT() && nodeWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nodeWhiteListConfig.getPUT()) {
+                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeWhiteListConfig.getDELETE() && nodeWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nodeWhiteListConfig.getDELETE()) {
+                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getGET() && nodeServerWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nodeServerWhiteListConfig.getGET()) {
+                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getPOST() && nodeServerWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nodeServerWhiteListConfig.getPOST()) {
+                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getPUT() && nodeServerWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nodeServerWhiteListConfig.getPUT()) {
+                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodeServerWhiteListConfig.getDELETE() && nodeServerWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nodeServerWhiteListConfig.getDELETE()) {
+                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
         }
     }
 }
