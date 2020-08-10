@@ -1,19 +1,18 @@
 package com.springboot.cloud.auth.client.service.impl;
 
-import com.springboot.cloud.auth.client.config.JWTProperties;
 import com.springboot.cloud.auth.client.config.NodeNestWhiteListConfig;
 import com.springboot.cloud.auth.client.config.NodeServerWhiteListConfig;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
-import com.springboot.cloud.auth.client.utils.JWTService;
+import com.springboot.cloud.auth.client.utils.AuthUtil;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
+import com.weds.framework.auth.service.JWTService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -56,21 +55,6 @@ public class K12AuthService implements IK12AuthService {
     @Value("${gate.ignore.authentication.startWith}")
     private String ignoreUrls = "/oauth";
 
-    /**
-     * 加密jwt中附带信息的key
-     */
-    @Value("${spring.security.oauth2.jwt.aesKey}")
-    private String aesKey;
-
-    /**
-     * 加密jwt中附带信息的value
-     */
-    @Value("${spring.security.oauth2.jwt.aesValue}")
-    private String aesValue;
-
-    @Autowired
-    private JWTProperties jwtProperties;
-
     @Autowired
     private NodeNestWhiteListConfig nodeWhiteListConfig;
 
@@ -78,7 +62,7 @@ public class K12AuthService implements IK12AuthService {
     private NodeServerWhiteListConfig nodeServerWhiteListConfig;
 
     @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private JWTService jwtService;
 
     //封装，不需要过滤的list列表
     private static List<Pattern> patterns = new ArrayList<>();
@@ -124,7 +108,7 @@ public class K12AuthService implements IK12AuthService {
         }
         String jwtData;
         try {
-            jwtData = JWTService.authorizationToken(authentication, jwtProperties, stringRedisTemplate);
+            jwtData = AuthUtil.authorizationToken(authentication, jwtService);
         } catch (IOException e) {
             e.printStackTrace();
             log.error(ExceptionUtils.getStackTrace(e));
