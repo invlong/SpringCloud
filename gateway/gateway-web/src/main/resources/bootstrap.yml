@@ -8,7 +8,8 @@ spring:
       discovery:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         namespace: ${REGISTER_NAMESPACE:aba811bc-87ee-4179-92a5-398b5684d55c}
-        group: ${REGISTER_GROUP:k12-dev}
+        group: k12-${CONFIG_SUFFIX:dev}
+        ip: ${SELF_HOST:10.0.0.110}
       config:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         file-extension: yml
@@ -16,13 +17,13 @@ spring:
         group: java
         ext-config:
           - data-id:
-              config-dev.yml
+              config-${CONFIG_SUFFIX:dev}.yml
             group:
               common
             refresh:
               true
           - data-id: # node服务的白名单
-              nodejs-whitelist-dev.yml
+              nodejs-whitelist-${CONFIG_SUFFIX:dev}.yml
             group:
               nodejs
             refresh:

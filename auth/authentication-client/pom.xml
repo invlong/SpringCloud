@@ -28,8 +28,9 @@
         </dependency>
         <!--oauth2认证-->
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
+            <groupId>com.springboot.cloud</groupId>
+            <artifactId>k12-auth</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <!--测试-->
         <dependency>
