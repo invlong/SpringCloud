@@ -9,7 +9,7 @@ spring:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         namespace: ${REGISTER_NAMESPACE:aba811bc-87ee-4179-92a5-398b5684d55c}
         group: k12-${CONFIG_SUFFIX:dev}
-        ip: ${SELF_HOST:10.0.0.110}
+        ip: ${SELF_HOST:10.19.0.16}
       config:
         server-addr: ${REGISTER_HOST:10.0.0.110}:${REGISTER_PORT:8848}
         file-extension: yml

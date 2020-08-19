@@ -8,7 +8,9 @@ import com.google.common.base.Strings;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
+import com.springboot.cloud.gateway.exception.AuthExceptionHandler;
 import com.springboot.cloud.gateway.service.IPermissionService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -26,6 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * 请求url权限校验
@@ -61,6 +64,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
      * @param chain
      * @return
      */
+    @SneakyThrows
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -114,19 +118,10 @@ public class K12AccessGatewayFilter implements GlobalFilter {
             return chain.filter(exchange.mutate().request(builder.build()).build());
         }
         // 增加鉴权失败错误提示
-        HttpStatus code;
-        if (permission.getCode().equals(K12AuthErrorType.AUTH_EXPIRE.getCode())) {
-            code = HttpStatus.NOT_ACCEPTABLE;
-        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_RE_LOGIN.getCode())) {
-            code = HttpStatus.UNAUTHORIZED;
-        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_ROLE_CHANGE.getCode())) {
-            code = HttpStatus.UNAUTHORIZED;
-        } else if (permission.getCode().equals(K12AuthErrorType.AUTH_WRONG_TOKEN.getCode())) {
-            code = HttpStatus.UNAUTHORIZED;
-        } else {
-            code = HttpStatus.UNAUTHORIZED;
-        }
-        return unauthorizedResp(exchange, code, permission.getMsg());
+        Map<String, Object> attributes = exchange.getAttributes();
+        attributes.put("code", permission.getCode());
+        attributes.put("tip", permission.getMsg());
+        throw new AuthExceptionHandler();
     }
 
     private static boolean isJSON(String str) {
