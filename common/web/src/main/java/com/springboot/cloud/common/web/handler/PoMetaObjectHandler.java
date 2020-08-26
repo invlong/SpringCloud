@@ -23,14 +23,14 @@ public class PoMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.setInsertFieldValByName("createdBy", getCurrentUsername(), metaObject);
-        this.setInsertFieldValByName("createdTime", Date.from(ZonedDateTime.now().toInstant()), metaObject);
+        this.setInsertFieldValByName("ctUserId", getCurrentUsername(), metaObject);
+        this.setInsertFieldValByName("ctDate", Date.from(ZonedDateTime.now().toInstant()), metaObject);
         this.updateFill(metaObject);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.setUpdateFieldValByName("updatedBy", getCurrentUsername(), metaObject);
-        this.setUpdateFieldValByName("updatedTime", Date.from(ZonedDateTime.now().toInstant()), metaObject);
+        this.setUpdateFieldValByName("utUserId", getCurrentUsername(), metaObject);
+        this.setUpdateFieldValByName("utDate", Date.from(ZonedDateTime.now().toInstant()), metaObject);
     }
 }

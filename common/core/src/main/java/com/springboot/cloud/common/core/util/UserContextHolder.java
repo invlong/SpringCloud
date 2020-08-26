@@ -57,7 +57,7 @@ public class UserContextHolder {
      * @return
      */
     public String getUsername() {
-        return Optional.ofNullable(threadLocal.get()).orElse(Maps.newHashMap()).get("user_name");
+        return Optional.ofNullable(threadLocal.get()).orElse(Maps.newHashMap()).get("userID");
     }
 
     /**
