@@ -12,18 +12,18 @@ import java.util.Date;
 @Data
 public class BasePo implements Serializable {
     public final static String DEFAULT_USERNAME = "system";
-    @TableId(type = IdType.ID_WORKER_STR)
+    @TableId(type = IdType.AUTO)
     private String id;
 
     @TableField(fill = FieldFill.INSERT)
-    private String createdBy;
+    private String ctUserId;
 
     @TableField(fill = FieldFill.INSERT)
-    private Date createdTime;
+    private Date ctDate;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updatedBy;
+    private String utUserId;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updatedTime;
+    private Date utDate;
 }
