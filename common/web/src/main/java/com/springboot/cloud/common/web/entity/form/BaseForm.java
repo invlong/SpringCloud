@@ -34,7 +34,7 @@ public class BaseForm<T extends BasePo> {
      * @param clazz
      * @return
      */
-    public T toPo(String id, Class<T> clazz) {
+    public T toPo(Integer id, Class<T> clazz) {
         T t = BeanUtils.instantiateClass(clazz);
         t.setId(id);
         BeanUtils.copyProperties(this, t);

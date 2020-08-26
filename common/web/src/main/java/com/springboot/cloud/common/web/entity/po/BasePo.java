@@ -13,7 +13,7 @@ import java.util.Date;
 public class BasePo implements Serializable {
     public final static String DEFAULT_USERNAME = "system";
     @TableId(type = IdType.AUTO)
-    private String id;
+    private Integer id;
 
     @TableField(fill = FieldFill.INSERT)
     private String ctUserId;
