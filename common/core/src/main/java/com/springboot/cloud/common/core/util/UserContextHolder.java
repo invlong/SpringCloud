@@ -61,6 +61,14 @@ public class UserContextHolder {
     }
 
     /**
+     * 获取上线文的schoolId
+     * @return
+     */
+    public String getSchoolId() {
+        return Optional.ofNullable(threadLocal.get()).orElse(Maps.newHashMap()).get("schoolId");
+    }
+
+    /**
      * 清空上下文
      */
     public void clear() {

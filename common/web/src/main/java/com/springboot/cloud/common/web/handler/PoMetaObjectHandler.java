@@ -21,9 +21,14 @@ public class PoMetaObjectHandler implements MetaObjectHandler {
         return StringUtils.defaultIfBlank(UserContextHolder.getInstance().getUsername(), BasePo.DEFAULT_USERNAME);
     }
 
+    private Integer getCurrentSchoolId() {
+        return null == UserContextHolder.getInstance().getSchoolId() ? BasePo.DEFAULT_SCHOOL_ID : Integer.valueOf(UserContextHolder.getInstance().getSchoolId());
+    }
+
     @Override
     public void insertFill(MetaObject metaObject) {
         this.setInsertFieldValByName("ctUserId", getCurrentUsername(), metaObject);
+        this.setInsertFieldValByName("schoolId", getCurrentUsername(), metaObject);
         this.setInsertFieldValByName("ctDate", Date.from(ZonedDateTime.now().toInstant()), metaObject);
         this.updateFill(metaObject);
     }

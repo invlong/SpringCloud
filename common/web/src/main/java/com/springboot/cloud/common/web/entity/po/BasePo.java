@@ -12,6 +12,8 @@ import java.util.Date;
 @Data
 public class BasePo implements Serializable {
     public final static String DEFAULT_USERNAME = "system";
+
+    public final static Integer DEFAULT_SCHOOL_ID = 101010;
     @TableId(type = IdType.AUTO)
     private Integer id;
 
@@ -26,4 +28,7 @@ public class BasePo implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date utDate;
+
+    @TableField(fill = FieldFill.INSERT)
+    private Integer schoolId;
 }
