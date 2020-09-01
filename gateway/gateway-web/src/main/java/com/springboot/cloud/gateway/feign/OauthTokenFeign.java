@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-@FeignClient(name = "k12-java-oauth", url = "localhost:8099", fallbackFactory = OauthTokenFeignFallBackFactory.class)
+@FeignClient(name = "k12-java-oauth", fallbackFactory = OauthTokenFeignFallBackFactory.class)
 public interface OauthTokenFeign {
 
     @RequestMapping(value = "/oauthTwo/checkToken", method = RequestMethod.POST, headers = {"Content-Type=application/json"})
