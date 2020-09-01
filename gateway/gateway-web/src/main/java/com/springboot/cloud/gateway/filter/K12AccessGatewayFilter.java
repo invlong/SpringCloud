@@ -126,7 +126,8 @@ public class K12AccessGatewayFilter implements GlobalFilter {
             }
             CheckTokenModel checkTokenModel = new CheckTokenModel(oauthToken, url);
             //调用oauth_server的token校验接口，判断token校验是否成功，以及是否有该url的访问权限。
-            Map<String, Object> checkTokenResult = oauthTokenFeign.checkToken(checkTokenModel);
+            Map<String, Object> checkTokenResult = oauthTokenFeign.checkToken(oauthToken, url);
+            log.info("checkTokenModel param is {}, result is {}", JSONObject.toJSONString(checkTokenModel), JSONObject.toJSONString(checkTokenResult));
             if (SUCC_CODE.equals(checkTokenResult.get("code"))) {
                 ServerHttpRequest.Builder builder = request.mutate();
                 if ((boolean) checkTokenResult.get("expired")) {
@@ -135,7 +136,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                     attributes.put("tip", OAUTH_TOKEN_ERROR_MSG);
                     throw new AuthExceptionHandler();
                 }
-                if ((boolean) checkTokenResult.get("urlPermission")) {
+                if (!(boolean) checkTokenResult.get("urlPermission")) {
                     Map<String, Object> attributes = exchange.getAttributes();
                     attributes.put("code", OAUTH_URL_ERROR);
                     attributes.put("tip", "您暂时没有请求该接口的权限，请检查请求地址是否正确。");

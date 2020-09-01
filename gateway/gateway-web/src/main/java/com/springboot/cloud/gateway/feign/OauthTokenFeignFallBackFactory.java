@@ -1,7 +1,6 @@
 package com.springboot.cloud.gateway.feign;
 
 import com.alibaba.fastjson.JSONObject;
-import com.springboot.cloud.gateway.feign.model.CheckTokenModel;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,13 +17,14 @@ public class OauthTokenFeignFallBackFactory implements FallbackFactory<OauthToke
         log.error(e.getMessage(), e);
         return new OauthTokenFeign() {
             @Override
-            public Map<String, Object> checkToken(CheckTokenModel checkTokenModel) {
-                log.info("OauthTokenFeignFallBack checkToken param is {}", JSONObject.toJSONString(checkTokenModel));
+            public Map<String, Object> checkToken(String accessToken,
+                                                  String url) {
+                log.info("OauthTokenFeignFallBack checkToken param is {}", accessToken);
                 Map<String, Object> checkResultMap = new HashMap<>();
                 checkResultMap.put("code", "-1");
                 checkResultMap.put("expired", true);
                 checkResultMap.put("tokenType", "bearer");
-                checkResultMap.put("value", checkTokenModel.getAccessToken());
+                checkResultMap.put("value", accessToken);
                 checkResultMap.put("urlPermission", false);
                 return checkResultMap;
             }
