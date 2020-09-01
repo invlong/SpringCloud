@@ -36,7 +36,7 @@ public class RoleService extends ServiceImpl<RoleMapper, Role> implements IRoleS
     @Override
     public boolean add(Role role) {
         boolean isSuccess = this.save(role);
-        roleResourceService.saveBatch(role.getId(), role.getResourceIds());
+        roleResourceService.saveBatch(String.valueOf(role.getId()), role.getResourceIds());
         return isSuccess;
     }
 
@@ -51,7 +51,7 @@ public class RoleService extends ServiceImpl<RoleMapper, Role> implements IRoleS
     @CacheInvalidate(name = "role::", key = "#role.id")
     public boolean update(Role role) {
         boolean isSuccess = this.updateById(role);
-        roleResourceService.saveBatch(role.getId(), role.getResourceIds());
+        roleResourceService.saveBatch(String.valueOf(role.getId()), role.getResourceIds());
         return isSuccess;
     }
 
