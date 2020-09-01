@@ -9,6 +9,8 @@ import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
 import com.springboot.cloud.gateway.exception.AuthExceptionHandler;
+import com.springboot.cloud.gateway.feign.OauthTokenFeign;
+import com.springboot.cloud.gateway.feign.model.CheckTokenModel;
 import com.springboot.cloud.gateway.service.IPermissionService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +48,12 @@ public class K12AccessGatewayFilter implements GlobalFilter {
     private static final String UNAUTHORIZED_STATUS = "status";
     private static final String UNAUTHORIZED_ERROR = "error";
     private static final String UNAUTHORIZED_MESSAGE = "message";
-
+    private static final String BEARER = "Bearer ";
+    private static final String SUCC_CODE = "600";
+    private static final String ERROR_CODE = "-1";
+    private static final String OAUTH_TOKEN_ERROR = "701";
+    private static final String OAUTH_URL_ERROR = "702";
+    private static final String OAUTH_TOKEN_ERROR_MSG = "token校验失败，请重新获取token。";
     /**
      * 由authentication-client模块提供签权的feign客户端
      */
@@ -55,6 +62,9 @@ public class K12AccessGatewayFilter implements GlobalFilter {
 
     @Autowired
     private IPermissionService permissionService;
+
+    @Autowired
+    private OauthTokenFeign oauthTokenFeign;
 
     /**
      * 1.首先网关检查token是否有效，无效直接返回401，不调用签权服务
@@ -77,7 +87,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
         }
         GlobalTraceIdContext.setRequestId(reqContextId);
         String finalReqContextId = reqContextId;
-        log.info("finalReqContextId is {}",finalReqContextId);
+        log.info("finalReqContextId is {}", finalReqContextId);
         String authentication = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String method = request.getMethodValue();
         String url = request.getPath().value();
@@ -103,6 +113,49 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                 }
             }
             return chain.filter(exchange);
+        }
+        //TODO 这里先简单处理，判断如果是oauth2请求的，就走新的ak sk token校验接口 @author limu。
+        if (StringUtils.isNotBlank(authentication) && authentication.startsWith(BEARER)) {
+            String oauthToken = StringUtils.substring(authentication, BEARER.length());
+            if (StringUtils.isBlank(oauthToken)) {
+                log.info("oauthToken is blank");
+                Map<String, Object> attributes = exchange.getAttributes();
+                attributes.put("code", OAUTH_TOKEN_ERROR);
+                attributes.put("tip", OAUTH_TOKEN_ERROR_MSG);
+                throw new AuthExceptionHandler();
+            }
+            CheckTokenModel checkTokenModel = new CheckTokenModel(oauthToken, url);
+            //调用oauth_server的token校验接口，判断token校验是否成功，以及是否有该url的访问权限。
+            Map<String, Object> checkTokenResult = oauthTokenFeign.checkToken(checkTokenModel);
+            if (SUCC_CODE.equals(checkTokenResult.get("code"))) {
+                ServerHttpRequest.Builder builder = request.mutate();
+                if ((boolean) checkTokenResult.get("expired")) {
+                    Map<String, Object> attributes = exchange.getAttributes();
+                    attributes.put("code", OAUTH_TOKEN_ERROR);
+                    attributes.put("tip", OAUTH_TOKEN_ERROR_MSG);
+                    throw new AuthExceptionHandler();
+                }
+                if ((boolean) checkTokenResult.get("urlPermission")) {
+                    Map<String, Object> attributes = exchange.getAttributes();
+                    attributes.put("code", OAUTH_URL_ERROR);
+                    attributes.put("tip", "您暂时没有请求该接口的权限，请检查请求地址是否正确。");
+                    throw new AuthExceptionHandler();
+                }
+                builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
+                if (checkTokenResult.get("clientId") != null) {
+                    //将jwt token中的用户信息传给服务
+                    builder.header(X_CLIENT_TOKEN_USER, String.valueOf(checkTokenResult.get("clientId")));
+                }
+                if (checkTokenResult.get("schoolId") != null) {
+                    builder.header(JWT_SCHOOL_ID, String.valueOf(checkTokenResult.get("schoolId")));
+                }
+                return chain.filter(exchange.mutate().request(builder.build()).build());
+            } else {
+                Map<String, Object> attributes = exchange.getAttributes();
+                attributes.put("code", "703");
+                attributes.put("tip", "服务异常，token校验失败！");
+                throw new AuthExceptionHandler();
+            }
         }
         //调用签权服务看用户是否有权限，若有权限进入下一个filter
         Result permission = permissionService.permission(authentication, url, method);
@@ -154,6 +207,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
 
     /**
      * 自定义返回
+     *
      * @param serverWebExchange
      * @param code
      * @param tip
