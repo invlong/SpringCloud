@@ -24,7 +24,7 @@ public class AuthTokenController {
     @PostMapping("/acquireToken")
     public Map<String, Object> acquireToken(@RequestBody Map<String, Object> map) {
         log.info("acquireToken param is {}", JSONObject.toJSONString(map));
-        AcquireTokenModel acquireTokenModel = new AcquireTokenModel("client_credentials", String.valueOf(map.get("appId")), String.valueOf(map.get("appSecret")));
+        AcquireTokenModel acquireTokenModel = new AcquireTokenModel("client_credentials", String.valueOf(map.get("app_id")), String.valueOf(map.get("app_secret")));
         Map<String, Object> outhResult = oauthTokenFeign.oauthToken(acquireTokenModel.getGrant_type(), acquireTokenModel.getClient_id(), acquireTokenModel.getClient_secret());
         if (!outhResult.containsKey("code")) {
             outhResult.put("code",600);
