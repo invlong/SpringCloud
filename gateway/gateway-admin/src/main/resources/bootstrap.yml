@@ -25,3 +25,8 @@ spring:
     sentinel:
       transport:
         dashboard: ${SENTINEL_DASHBOARD_HOST:10.0.0.110}:${SENTINEL_DASHBOARD_PORT:18021}
+      metric:
+        file-single-size: 52428800 #50MB
+        file-total-count: 3
+      log:
+        dir: ${log.path}/${spring.application.name}

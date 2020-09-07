@@ -46,6 +46,8 @@
         <com.springboot.cloud-core.version>0.0.1-SNAPSHOT</com.springboot.cloud-core.version>
         <com.springboot.cloud-web.version>0.0.1-SNAPSHOT</com.springboot.cloud-web.version>
         <com.springboot.cloud-authentication-client.version>0.0.1-SNAPSHOT</com.springboot.cloud-authentication-client.version>
+        <nacos-spring-context.version>0.3.6</nacos-spring-context.version>
+        <jackson-core.version>2.11.2</jackson-core.version>
         <docker.image.prefix>10.0.0.102/java</docker.image.prefix>
     </properties>
 
@@ -169,6 +171,11 @@
                 <version>${druid-starter}</version>
             </dependency>
             <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-spring-context</artifactId>
+                <version>${nacos-spring-context.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector-java.version}</version>
@@ -227,6 +234,16 @@
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils-core</artifactId>
                 <version>${commons-beanutils-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
