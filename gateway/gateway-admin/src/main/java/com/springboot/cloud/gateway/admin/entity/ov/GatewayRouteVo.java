@@ -33,16 +33,16 @@ public class GatewayRouteVo extends BaseVo {
     private List<PredicateDefinition> predicates = new ArrayList<>();
 
     public GatewayRouteVo(GatewayRoute gatewayRoute) {
-        this.id = gatewayRoute.getId();
+        this.id = String.valueOf(gatewayRoute.getId());
         this.routeId = gatewayRoute.getRouteId();
         this.uri = gatewayRoute.getUri();
         this.description = gatewayRoute.getDescription();
         this.status = gatewayRoute.getStatus();
         this.orders = gatewayRoute.getOrders();
-        this.createdBy = gatewayRoute.getCreatedBy();
-        this.createdTime = gatewayRoute.getCreatedTime();
-        this.updatedBy = gatewayRoute.getUpdatedBy();
-        this.updatedTime = gatewayRoute.getUpdatedTime();
+        this.createdBy = gatewayRoute.getCtUserId();
+        this.createdTime = gatewayRoute.getCtDate();
+        this.updatedBy = gatewayRoute.getUtUserId();
+        this.updatedTime = gatewayRoute.getUtDate();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             this.filters = objectMapper.readValue(gatewayRoute.getFilters(), new TypeReference<List<FilterDefinition>>() {

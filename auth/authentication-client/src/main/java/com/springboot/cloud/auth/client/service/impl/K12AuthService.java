@@ -17,9 +17,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
 //import com.springboot.cloud.auth.client.provider.K12AuthProvider;
@@ -65,10 +64,11 @@ public class K12AuthService implements IK12AuthService {
     private JWTService jwtService;
 
     //封装，不需要过滤的list列表
-    private static List<Pattern> patterns = new ArrayList<>();
+    private static CopyOnWriteArrayList<Pattern> patterns;
 
     @PostConstruct
     public void init() {
+        patterns = new CopyOnWriteArrayList<>();
         patterns.add(Pattern.compile("v2/api-docs.*"));
         patterns.add(Pattern.compile("configuration/ui.*"));
         patterns.add(Pattern.compile("swagger-resources.*"));

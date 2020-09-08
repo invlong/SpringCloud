@@ -47,7 +47,7 @@ public class GatewayRouteController {
     @PutMapping(value = "/{id}")
     public Result update(@PathVariable String id, @Valid @RequestBody GatewayRouteForm gatewayRoutForm) {
         GatewayRoute gatewayRout = gatewayRoutForm.toPo(GatewayRoute.class);
-        gatewayRout.setId(id);
+        gatewayRout.setId(Integer.valueOf(id));
         return Result.success(gatewayRoutService.update(gatewayRout));
     }
 
