@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.common.core.entity.vo.Result;
 import com.springboot.cloud.common.core.exception.K12AuthErrorType;
@@ -145,7 +146,8 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                 builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
                 if (checkTokenResult.get("clientId") != null) {
                     //将jwt token中的用户信息传给服务
-                    builder.header(X_CLIENT_TOKEN_USER, String.valueOf(checkTokenResult.get("clientId")));
+                    Map<String, Object> userMap = ImmutableMap.of("userID", String.valueOf(checkTokenResult.get("clientId")), "schoolId", String.valueOf(checkTokenResult.get("schoolId")));
+                    builder.header(X_CLIENT_TOKEN_USER, JSONObject.toJSONString(userMap));
                 }
                 if (checkTokenResult.get("schoolId") != null) {
                     builder.header(JWT_SCHOOL_ID, String.valueOf(checkTokenResult.get("schoolId")));
