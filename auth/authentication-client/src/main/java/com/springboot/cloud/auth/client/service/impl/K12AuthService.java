@@ -1,6 +1,7 @@
 package com.springboot.cloud.auth.client.service.impl;
 
 import com.springboot.cloud.auth.client.config.NodeNestWhiteListConfig;
+import com.springboot.cloud.auth.client.config.NodePaymentWhiteListConfig;
 import com.springboot.cloud.auth.client.config.NodeServerWhiteListConfig;
 import com.springboot.cloud.auth.client.service.IK12AuthService;
 import com.springboot.cloud.auth.client.utils.AuthUtil;
@@ -56,6 +57,9 @@ public class K12AuthService implements IK12AuthService {
 
     @Autowired
     private NodeNestWhiteListConfig nodeWhiteListConfig;
+
+    @Autowired
+    private NodePaymentWhiteListConfig nodePaymentWhiteListConfig;
 
     @Autowired
     private NodeServerWhiteListConfig nodeServerWhiteListConfig;
@@ -237,6 +241,39 @@ public class K12AuthService implements IK12AuthService {
         }
         if (null != nodeServerWhiteListConfig.getDELETE() && nodeServerWhiteListConfig.getDELETE().size() > 0) {
             for (String delStr : nodeServerWhiteListConfig.getDELETE()) {
+                String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        // payment
+        if (null != nodePaymentWhiteListConfig.getGET() && nodePaymentWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nodePaymentWhiteListConfig.getGET()) {
+                String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.debug(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodePaymentWhiteListConfig.getPOST() && nodePaymentWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nodePaymentWhiteListConfig.getPOST()) {
+                String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodePaymentWhiteListConfig.getPUT() && nodePaymentWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nodePaymentWhiteListConfig.getPUT()) {
+                String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
+                String finalStr = newStr.substring(0, newStr.length() - 2);
+                log.info(finalStr);
+                patterns.add(Pattern.compile(finalStr));
+            }
+        }
+        if (null != nodePaymentWhiteListConfig.getDELETE() && nodePaymentWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nodePaymentWhiteListConfig.getDELETE()) {
                 String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
