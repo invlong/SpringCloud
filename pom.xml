@@ -48,6 +48,9 @@
         <com.springboot.cloud-authentication-client.version>0.0.1-SNAPSHOT</com.springboot.cloud-authentication-client.version>
         <nacos-spring-context.version>0.3.6</nacos-spring-context.version>
         <jackson-core.version>2.11.2</jackson-core.version>
+        <junit.version>5.7.0</junit.version>
+        <surefire.version>3.0.0-M5</surefire.version>
+        <hamcrest.version>2.2</hamcrest.version>
         <docker.image.prefix>10.0.0.102/java</docker.image.prefix>
     </properties>
 
@@ -84,6 +87,30 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -292,6 +319,10 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${docker-maven-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
             </plugin>
         </plugins>
     </build>
