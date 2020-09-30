@@ -51,10 +51,7 @@ public class K12AccessGatewayFilter implements GlobalFilter {
     private static final String UNAUTHORIZED_MESSAGE = "message";
     private static final String BEARER = "Bearer ";
     private static final String SUCC_CODE = "600";
-    private static final String ERROR_CODE = "-1";
-    private static final String OAUTH_TOKEN_ERROR = "701";
-    private static final String OAUTH_URL_ERROR = "702";
-    private static final String OAUTH_TOKEN_ERROR_MSG = "token校验失败，请重新获取token。";
+
     /**
      * 由authentication-client模块提供签权的feign客户端
      */
@@ -121,8 +118,8 @@ public class K12AccessGatewayFilter implements GlobalFilter {
             if (StringUtils.isBlank(oauthToken)) {
                 log.info("oauthToken is blank");
                 Map<String, Object> attributes = exchange.getAttributes();
-                attributes.put("code", OAUTH_TOKEN_ERROR);
-                attributes.put("tip", OAUTH_TOKEN_ERROR_MSG);
+                attributes.put("code", K12AuthErrorType.AUTH_OAUTH.getCode());
+                attributes.put("tip", K12AuthErrorType.AUTH_OAUTH.getMsg());
                 throw new AuthExceptionHandler();
             }
             CheckTokenModel checkTokenModel = new CheckTokenModel(oauthToken, url);
@@ -133,14 +130,14 @@ public class K12AccessGatewayFilter implements GlobalFilter {
                 ServerHttpRequest.Builder builder = request.mutate();
                 if ((boolean) checkTokenResult.get("expired")) {
                     Map<String, Object> attributes = exchange.getAttributes();
-                    attributes.put("code", OAUTH_TOKEN_ERROR);
-                    attributes.put("tip", OAUTH_TOKEN_ERROR_MSG);
+                    attributes.put("code", K12AuthErrorType.AUTH_OAUTH.getCode());
+                    attributes.put("tip", K12AuthErrorType.AUTH_OAUTH.getMsg());
                     throw new AuthExceptionHandler();
                 }
                 if (!(boolean) checkTokenResult.get("urlPermission")) {
                     Map<String, Object> attributes = exchange.getAttributes();
-                    attributes.put("code", OAUTH_URL_ERROR);
-                    attributes.put("tip", "您暂时没有请求该接口的权限，请检查请求地址是否正确。");
+                    attributes.put("code", K12AuthErrorType.AUTH_WRONG_URL.getCode());
+                    attributes.put("tip", K12AuthErrorType.AUTH_WRONG_URL.getMsg());
                     throw new AuthExceptionHandler();
                 }
                 builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
