@@ -55,6 +55,7 @@
         <dbunit.version>2.7.0</dbunit.version>
         <rider.version>1.10.0</rider.version>
         <spring-test-dbunit.version>1.3.0</spring-test-dbunit.version>
+        <sentry.version>1.7.31-SNAPSHOT</sentry.version>
         <docker.image.prefix>10.0.0.102/java</docker.image.prefix>
     </properties>
 
@@ -319,6 +320,16 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-spring-boot-starter</artifactId>
+                <version>${sentry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-logback</artifactId>
+                <version>${sentry.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

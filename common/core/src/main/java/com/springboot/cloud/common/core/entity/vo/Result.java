@@ -118,6 +118,16 @@ public class Result<T> {
     /**
      * 系统异常类并返回结果数据
      *
+     * @param msg
+     * @return Result
+     */
+    public static Result fail(BaseException baseException, String msg) {
+        return new Result<>(baseException.getErrorType().getCode(), msg, null);
+    }
+
+    /**
+     * 系统异常类并返回结果数据
+     *
      * @param errorType
      * @param data
      * @return Result

@@ -56,7 +56,7 @@ public class K12AuthService implements IK12AuthService {
     private String ignoreUrls = "/oauth";
 
     @Autowired
-    private NodeNestWhiteListConfig nodeWhiteListConfig;
+    private NodeNestWhiteListConfig nestWhiteListConfig;
 
     @Autowired
     private NodePaymentWhiteListConfig nodePaymentWhiteListConfig;
@@ -85,6 +85,22 @@ public class K12AuthService implements IK12AuthService {
         initNodeWhiteList();
         // java白名单
         initJavaWhiteList();
+    }
+
+    public void setNestWhiteListConfig(NodeNestWhiteListConfig nestWhiteListConfig) {
+        this.nestWhiteListConfig = nestWhiteListConfig;
+    }
+
+    public void setNodePaymentWhiteListConfig(NodePaymentWhiteListConfig nodePaymentWhiteListConfig) {
+        this.nodePaymentWhiteListConfig = nodePaymentWhiteListConfig;
+    }
+
+    public void setNodeServerWhiteListConfig(NodeServerWhiteListConfig nodeServerWhiteListConfig) {
+        this.nodeServerWhiteListConfig = nodeServerWhiteListConfig;
+    }
+
+    public void setIgnoreUrls(String ignoreUrls) {
+        this.ignoreUrls = ignoreUrls;
     }
 
     @Override
@@ -183,32 +199,32 @@ public class K12AuthService implements IK12AuthService {
 
     private void initNodeWhiteList() {
         // node配置中的白名单
-        if (null != nodeWhiteListConfig.getGET() && nodeWhiteListConfig.getGET().size() > 0) {
-            for (String getStr : nodeWhiteListConfig.getGET()) {
+        if (null != nestWhiteListConfig.getGET() && nestWhiteListConfig.getGET().size() > 0) {
+            for (String getStr : nestWhiteListConfig.getGET()) {
                 String newStr = getStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.debug(finalStr);
                 patterns.add(Pattern.compile(finalStr));
             }
         }
-        if (null != nodeWhiteListConfig.getPOST() && nodeWhiteListConfig.getPOST().size() > 0) {
-            for (String postStr : nodeWhiteListConfig.getPOST()) {
+        if (null != nestWhiteListConfig.getPOST() && nestWhiteListConfig.getPOST().size() > 0) {
+            for (String postStr : nestWhiteListConfig.getPOST()) {
                 String newStr = postStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
             }
         }
-        if (null != nodeWhiteListConfig.getPUT() && nodeWhiteListConfig.getPUT().size() > 0) {
-            for (String putStr : nodeWhiteListConfig.getPUT()) {
+        if (null != nestWhiteListConfig.getPUT() && nestWhiteListConfig.getPUT().size() > 0) {
+            for (String putStr : nestWhiteListConfig.getPUT()) {
                 String newStr = putStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);
                 patterns.add(Pattern.compile(finalStr));
             }
         }
-        if (null != nodeWhiteListConfig.getDELETE() && nodeWhiteListConfig.getDELETE().size() > 0) {
-            for (String delStr : nodeWhiteListConfig.getDELETE()) {
+        if (null != nestWhiteListConfig.getDELETE() && nestWhiteListConfig.getDELETE().size() > 0) {
+            for (String delStr : nestWhiteListConfig.getDELETE()) {
                 String newStr = delStr.replace("/^", "^").replaceAll("\\\\/", "/");
                 String finalStr = newStr.substring(0, newStr.length() - 2);
                 log.info(finalStr);

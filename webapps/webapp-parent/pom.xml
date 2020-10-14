@@ -35,11 +35,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.flywaydb</groupId>-->
+<!--            <artifactId>flyway-core</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
         <!--Swagger2 - RESTful API文档-->
         <dependency>
             <groupId>io.springfox</groupId>
