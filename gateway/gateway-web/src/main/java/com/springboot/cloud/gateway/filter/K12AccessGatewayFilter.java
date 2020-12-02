@@ -112,68 +112,64 @@ public class K12AccessGatewayFilter implements GlobalFilter {
             }
             return chain.filter(exchange);
         }
+        // 增加鉴权失败错误提示
+        Map<String, Object> attributes = exchange.getAttributes();
         //TODO 这里先简单处理，判断如果是oauth2请求的，就走新的ak sk token校验接口 @author limu。
         if (StringUtils.isNotBlank(authentication) && authentication.startsWith(BEARER)) {
             String oauthToken = StringUtils.substring(authentication, BEARER.length());
-            if (StringUtils.isBlank(oauthToken)) {
+            if (!StringUtils.isBlank(oauthToken)) {
+                CheckTokenModel checkTokenModel = new CheckTokenModel(oauthToken, url);
+                //调用oauth_server的token校验接口，判断token校验是否成功，以及是否有该url的访问权限。
+                Map<String, Object> checkTokenResult = oauthTokenFeign.checkToken(oauthToken, url);
+                log.info("checkTokenModel param is {}, result is {}", JSONObject.toJSONString(checkTokenModel), JSONObject.toJSONString(checkTokenResult));
+                if (SUCC_CODE.equals(checkTokenResult.get("code"))) {
+                    if (!(boolean) checkTokenResult.get("expired") && (boolean) checkTokenResult.get("urlPermission")) {
+                        ServerHttpRequest.Builder builder = request.mutate();
+                        builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
+                        if (checkTokenResult.get("clientId") != null) {
+                            //将jwt token中的用户信息传给服务
+                            Map<String, Object> userMap = ImmutableMap.of("userID", String.valueOf(checkTokenResult.get("clientId")), "schoolId", String.valueOf(checkTokenResult.get("schoolId")));
+                            builder.header(X_CLIENT_TOKEN_USER, JSONObject.toJSONString(userMap));
+                        }
+                        if (checkTokenResult.get("schoolId") != null) {
+                            builder.header(JWT_SCHOOL_ID, String.valueOf(checkTokenResult.get("schoolId")));
+                        }
+                        return chain.filter(exchange.mutate().request(builder.build()).build());
+                    }
+                    if ((boolean) checkTokenResult.get("expired")) {
+                        attributes.put("code", K12AuthErrorType.AUTH_OAUTH.getCode());
+                        attributes.put("tip", K12AuthErrorType.AUTH_OAUTH.getMsg());
+                    }
+                    if (!(boolean) checkTokenResult.get("urlPermission")) {
+                        attributes.put("code", K12AuthErrorType.AUTH_WRONG_URL.getCode());
+                        attributes.put("tip", K12AuthErrorType.AUTH_WRONG_URL.getMsg());
+                    }
+                } else {
+                    attributes.put("code", "703");
+                    attributes.put("tip", "服务异常，token校验失败！");
+                }
+            } else {
                 log.info("oauthToken is blank");
-                Map<String, Object> attributes = exchange.getAttributes();
                 attributes.put("code", K12AuthErrorType.AUTH_OAUTH.getCode());
                 attributes.put("tip", K12AuthErrorType.AUTH_OAUTH.getMsg());
-                throw new AuthExceptionHandler();
             }
-            CheckTokenModel checkTokenModel = new CheckTokenModel(oauthToken, url);
-            //调用oauth_server的token校验接口，判断token校验是否成功，以及是否有该url的访问权限。
-            Map<String, Object> checkTokenResult = oauthTokenFeign.checkToken(oauthToken, url);
-            log.info("checkTokenModel param is {}, result is {}", JSONObject.toJSONString(checkTokenModel), JSONObject.toJSONString(checkTokenResult));
-            if (SUCC_CODE.equals(checkTokenResult.get("code"))) {
+        } else {
+            //调用签权服务看用户是否有权限，若有权限进入下一个filter
+            Result permission = permissionService.permission(authentication, url, method);
+            if (permission.isSuccess()) {
+                JSONObject userData = JSON.parseObject(String.valueOf(permission.getData()));
                 ServerHttpRequest.Builder builder = request.mutate();
-                if ((boolean) checkTokenResult.get("expired")) {
-                    Map<String, Object> attributes = exchange.getAttributes();
-                    attributes.put("code", K12AuthErrorType.AUTH_OAUTH.getCode());
-                    attributes.put("tip", K12AuthErrorType.AUTH_OAUTH.getMsg());
-                    throw new AuthExceptionHandler();
-                }
-                if (!(boolean) checkTokenResult.get("urlPermission")) {
-                    Map<String, Object> attributes = exchange.getAttributes();
-                    attributes.put("code", K12AuthErrorType.AUTH_WRONG_URL.getCode());
-                    attributes.put("tip", K12AuthErrorType.AUTH_WRONG_URL.getMsg());
-                    throw new AuthExceptionHandler();
-                }
+                //TODO 转发的请求都加上服务间认证token
+                builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
                 builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
-                if (checkTokenResult.get("clientId") != null) {
-                    //将jwt token中的用户信息传给服务
-                    Map<String, Object> userMap = ImmutableMap.of("userID", String.valueOf(checkTokenResult.get("clientId")), "schoolId", String.valueOf(checkTokenResult.get("schoolId")));
-                    builder.header(X_CLIENT_TOKEN_USER, JSONObject.toJSONString(userMap));
-                }
-                if (checkTokenResult.get("schoolId") != null) {
-                    builder.header(JWT_SCHOOL_ID, String.valueOf(checkTokenResult.get("schoolId")));
-                }
+                //将jwt token中的用户信息传给服务
+                builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
+                log.debug("转发请求");
                 return chain.filter(exchange.mutate().request(builder.build()).build());
-            } else {
-                Map<String, Object> attributes = exchange.getAttributes();
-                attributes.put("code", "703");
-                attributes.put("tip", "服务异常，token校验失败！");
-                throw new AuthExceptionHandler();
             }
+            attributes.put("code", permission.getCode());
+            attributes.put("tip", permission.getMsg());
         }
-        //调用签权服务看用户是否有权限，若有权限进入下一个filter
-        Result permission = permissionService.permission(authentication, url, method);
-        if (permission.isSuccess()) {
-            JSONObject userData = JSON.parseObject(String.valueOf(permission.getData()));
-            ServerHttpRequest.Builder builder = request.mutate();
-            //TODO 转发的请求都加上服务间认证token
-            builder.header(X_CLIENT_TOKEN, "TODO zhoutaoo添加服务间简单认证");
-            builder.header(GlobalTraceIdContext.REQUESTID_HEADER_KEY, finalReqContextId);
-            //将jwt token中的用户信息传给服务
-            builder.header(X_CLIENT_TOKEN_USER, userData.toJSONString());
-            log.debug("转发请求");
-            return chain.filter(exchange.mutate().request(builder.build()).build());
-        }
-        // 增加鉴权失败错误提示
-        Map<String, Object> attributes = exchange.getAttributes();
-        attributes.put("code", permission.getCode());
-        attributes.put("tip", permission.getMsg());
         throw new AuthExceptionHandler();
     }
 

@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @Configuration
 public class CorsConfiguration {
 
-    private static final String ALLOWED_HEADERS = "User-Agent,Origin,Cache-Control,Content-type,Date,Server,withCredentials,authorization";
+    private static final String ALLOWED_HEADERS = "User-Agent,Origin,Cache-Control,Content-type,Date,Server,withCredentials,authorization,x-requested-with";
     private static final String ALLOWED_METHODS = "GET, POST, PUT, DELETE, OPTIONS, HEAD";
     private static final String ALLOWED_ORIGIN = "*";
     private static final String ALLOWED_EXPOSE = "accesstoken";
